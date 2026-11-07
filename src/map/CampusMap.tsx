@@ -1,6 +1,9 @@
-import { memo } from "react";
+import { memo, useCallback, useState } from "react";
 import { campusMap } from "../data/campusMap";
 import type { Building, Rect } from "../data/types";
+import { BuildingPanel } from "../journal/BuildingPanel";
+import type { JournalEntry } from "../journal/types";
+import { useBuildingClick } from "./useBuildingClick";
 import { useBuildingHover } from "./useBuildingHover";
 import type { HoverPoint } from "./useBuildingHover";
 import { useMapView } from "./useMapView";
@@ -32,8 +35,19 @@ const TOOLTIP_FLIP_Y = 200;
 
 const buildingsById = new Map(campusMap.buildings.map((b) => [b.id, b]));
 
+interface MapShapesProps {
+  selectedId: string | null;
+  entries: ReadonlyMap<string, JournalEntry>;
+}
+
+function buildingClass(id: string, { selectedId, entries }: MapShapesProps): string | undefined {
+  const classes = [entries.has(id) && "logged", id === selectedId && "selected"].filter(Boolean);
+  return classes.length > 0 ? classes.join(" ") : undefined;
+}
+
 // The paths never change, so panning and zooming only update the parent <g>.
-const MapShapes = memo(function MapShapes() {
+// This only re-renders when the selection or journal changes.
+const MapShapes = memo(function MapShapes(props: MapShapesProps) {
   return (
     <g clipPath={`url(#${CLIP_ID})`}>
       <g className="blocks">
@@ -48,7 +62,12 @@ const MapShapes = memo(function MapShapes() {
       </g>
       <g className="buildings">
         {campusMap.buildings.map((building) => (
-          <path key={building.id} id={building.id} d={building.d} />
+          <path
+            key={building.id}
+            id={building.id}
+            d={building.d}
+            className={buildingClass(building.id, props)}
+          />
         ))}
       </g>
       <g className="roads">
@@ -68,7 +87,6 @@ const MapShapes = memo(function MapShapes() {
 function BuildingTooltip({ building, point }: { building: Building; point: HoverPoint }) {
   const flipX = point.x > window.innerWidth - TOOLTIP_FLIP_X;
   const flipY = point.y > window.innerHeight - TOOLTIP_FLIP_Y;
-  const names = building.names.length > 0 ? building.names : [`Building ${building.number}`];
   return (
     <ul
       className="map-tooltip"
@@ -79,7 +97,7 @@ function BuildingTooltip({ building, point }: { building: Building; point: Hover
         transform: `translate(${flipX ? "-100%" : "0"}, ${flipY ? "-100%" : "0"})`,
       }}
     >
-      {names.map((name) => (
+      {building.names.map((name) => (
         <li key={name}>{name}</li>
       ))}
     </ul>
@@ -92,6 +110,25 @@ export function CampusMap() {
   const { hover, hoverHandlers } = useBuildingHover(view);
   const hoveredBuilding = hover && buildingsById.get(hover.buildingId);
 
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [entries, setEntries] = useState<ReadonlyMap<string, JournalEntry>>(new Map());
+  const selectedBuilding = selectedId ? buildingsById.get(selectedId) : undefined;
+  const clickHandlers = useBuildingClick(setSelectedId);
+  const closePanel = useCallback(() => setSelectedId(null), []);
+
+  const saveEntry = (id: string, entry: JournalEntry) => {
+    setEntries((current) => new Map(current).set(id, entry));
+    setSelectedId(null);
+  };
+  const removeEntry = (id: string) => {
+    setEntries((current) => {
+      const next = new Map(current);
+      next.delete(id);
+      return next;
+    });
+    setSelectedId(null);
+  };
+
   return (
     <main className="map-page">
       <div
@@ -102,6 +139,11 @@ export function CampusMap() {
         tabIndex={0}
         {...handlers}
         {...hoverHandlers}
+        {...clickHandlers}
+        onPointerDownCapture={(event) => {
+          hoverHandlers.onPointerDownCapture();
+          clickHandlers.onPointerDownCapture(event);
+        }}
       >
         {view && (
           <svg width="100%" height="100%" aria-hidden="true">
@@ -111,13 +153,23 @@ export function CampusMap() {
               </clipPath>
             </defs>
             <g transform={`translate(${view.x} ${view.y}) scale(${view.k})`}>
-              <MapShapes />
+              <MapShapes selectedId={selectedId} entries={entries} />
             </g>
           </svg>
         )}
       </div>
       {hover && hoveredBuilding && (
         <BuildingTooltip building={hoveredBuilding} point={hover.point} />
+      )}
+      {selectedBuilding && (
+        <BuildingPanel
+          key={selectedBuilding.id}
+          building={selectedBuilding}
+          entry={entries.get(selectedBuilding.id)}
+          onSave={(entry) => saveEntry(selectedBuilding.id, entry)}
+          onRemove={() => removeEntry(selectedBuilding.id)}
+          onClose={closePanel}
+        />
       )}
       <div className="map-controls">
         <button type="button" onClick={zoomIn} disabled={!canZoomIn} aria-label="Zoom in">

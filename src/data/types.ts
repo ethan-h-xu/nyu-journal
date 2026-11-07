@@ -9,8 +9,8 @@ export interface Building {
   id: string;
   /** The building's number on the PDF map. */
   number: number;
-  /** Every name the PDF's index lists for this number; empty if it lists none. */
-  names: string[];
+  /** The names the PDF's index lists for this number. Unnamed buildings aren't supported. */
+  names: [string, ...string[]];
   d: string;
 }
 
