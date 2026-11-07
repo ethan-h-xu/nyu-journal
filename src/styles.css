@@ -1,0 +1,153 @@
+:root {
+  --block: #d5d6d9;
+  --park: #9fbf81;
+  --building: #262261;
+  --building-hover: #5b3fb0;
+  --road: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+.map-page {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+
+.map-stage {
+  position: absolute;
+  inset: 0;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.map-stage:active {
+  cursor: grabbing;
+}
+
+.map-stage:focus {
+  outline: none;
+}
+
+.map-stage:focus-visible {
+  outline: 3px solid var(--building-hover);
+  outline-offset: -3px;
+}
+
+.map-stage > svg {
+  display: block;
+}
+
+.blocks path {
+  fill: var(--block);
+  /* Hides hairline seams where neighboring block shapes meet. */
+  stroke: var(--block);
+  stroke-width: 1;
+  pointer-events: none;
+}
+
+.parks path {
+  fill: var(--park);
+  pointer-events: none;
+}
+
+.buildings path {
+  fill: var(--building);
+}
+
+.buildings path:hover {
+  fill: var(--building-hover);
+}
+
+.roads path {
+  pointer-events: none;
+}
+
+.road-fill {
+  fill: var(--road);
+}
+
+.road-line {
+  fill: none;
+  stroke: var(--road);
+}
+
+.map-controls {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 30%);
+}
+
+.map-controls button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-top: 1px solid #e3e3e6;
+  background: none;
+  color: var(--building);
+  font: 500 22px/1 system-ui, sans-serif;
+  cursor: pointer;
+}
+
+.map-controls button:first-child {
+  border-top: 0;
+}
+
+.map-controls button:hover:not(:disabled) {
+  background: #f1f0f7;
+}
+
+.map-controls button:disabled {
+  color: #b5b5bb;
+  cursor: default;
+}
+
+.map-controls button:focus-visible {
+  outline: 2px solid var(--building-hover);
+  outline-offset: -2px;
+}
+
+.map-reset path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+
+.map-tooltip {
+  position: fixed;
+  z-index: 1;
+  max-width: 280px;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 2px 10px rgb(0 0 0 / 28%);
+  color: var(--building);
+  font: 500 14px/1.35 system-ui, sans-serif;
+  list-style: none;
+  pointer-events: none;
+}
+
+.map-tooltip li + li {
+  margin-top: 4px;
+}
