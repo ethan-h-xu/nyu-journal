@@ -4,9 +4,10 @@ export const NOTES_MAX_LENGTH = 200;
 export const RATING_MAX = 5;
 export const RATING_STEP = 0.5;
 
-/** A journal entry for one building. Mock data for now: kept in memory only. */
+/** One visit to a building. Mock data for now: kept in memory only. */
 export interface JournalEntry {
-  /** ISO date, YYYY-MM-DD. */
+  id: string;
+  /** ISO date, YYYY-MM-DD. Required. */
   date: string;
   /** Free text, at most FLOOR_MAX_LENGTH characters. */
   floor: string;
@@ -15,3 +16,6 @@ export interface JournalEntry {
   /** At most NOTES_MAX_LENGTH characters. */
   notes: string;
 }
+
+/** Every building's entries, by building id. Buildings with none are absent. */
+export type Journal = ReadonlyMap<string, readonly JournalEntry[]>;

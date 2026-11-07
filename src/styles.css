@@ -232,7 +232,7 @@ body,
   color: var(--ink);
 }
 
-.building-panel-form {
+.building-panel-body {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -240,6 +240,95 @@ body,
   min-height: 0;
   padding: 18px;
   overflow-y: auto;
+}
+
+.building-panel-subtitle {
+  margin: 6px 0 0;
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.entry-new {
+  align-self: stretch;
+}
+
+.entry-log {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.entry {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.entry-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.entry-floor {
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.entry-notes {
+  margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.entry-actions {
+  display: flex;
+  gap: 4px;
+  margin-left: -8px;
+}
+
+.entry-actions button {
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--building-hover);
+  font: 600 13px/1 system-ui, sans-serif;
+  cursor: pointer;
+}
+
+.entry-actions button:hover {
+  background: #f1f0f7;
+}
+
+.entry-actions button:last-child {
+  color: #c62828;
+}
+
+.poop-score {
+  display: flex;
+  gap: 2px;
+}
+
+.poop-score .poop-slot {
+  font-size: 18px;
+}
+
+.poop-score-none {
+  color: var(--ink-soft);
+  font-size: 13px;
 }
 
 .field {
@@ -327,6 +416,11 @@ body,
 .field-hint {
   align-self: flex-end;
   color: var(--ink-soft);
+}
+
+.field-required {
+  color: #c62828;
+  text-decoration: none;
 }
 
 .poop-rating-row {

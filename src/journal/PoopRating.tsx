@@ -6,6 +6,40 @@ const SLOTS = Array.from({ length: RATING_MAX }, (_, i) => i + 1);
 
 const clamp = (n: number) => Math.min(RATING_MAX, Math.max(0, n));
 
+/** One poop, colored in from the left by `fill` (0–1). */
+function PoopGlyph({ fill }: { fill: number }) {
+  return (
+    <>
+      <span className="poop-empty" aria-hidden="true">
+        💩
+      </span>
+      <span
+        className="poop-fill"
+        aria-hidden="true"
+        // Crops only from the right: the glyph spills past its line box,
+        // so the vertical insets are negative to keep it whole.
+        style={{ clipPath: `inset(-50% ${(1 - Math.min(1, fill)) * 100}% -50% 0)` }}
+      >
+        💩
+      </span>
+    </>
+  );
+}
+
+/** A read-only rating, for showing saved entries. */
+export function PoopScore({ value }: { value: number }) {
+  if (value === 0) return <span className="poop-score-none">Unrated</span>;
+  return (
+    <span className="poop-score" role="img" aria-label={`${value} out of ${RATING_MAX}`}>
+      {SLOTS.map((slot) => (
+        <span key={slot} className="poop-slot">
+          <PoopGlyph fill={clamp(value - (slot - 1))} />
+        </span>
+      ))}
+    </span>
+  );
+}
+
 interface PoopRatingProps {
   value: number;
   onChange: (value: number) => void;
@@ -68,18 +102,7 @@ export function PoopRating({ value, onChange, labelId }: PoopRatingProps) {
                 onChange(next === value ? 0 : next);
               }}
             >
-              <span className="poop-empty" aria-hidden="true">
-                💩
-              </span>
-              <span
-                className="poop-fill"
-                aria-hidden="true"
-                // Crops only from the right: the glyph spills past its line box,
-                // so the vertical insets are negative to keep it whole.
-                style={{ clipPath: `inset(-50% ${(1 - Math.min(1, fill)) * 100}% -50% 0)` }}
-              >
-                💩
-              </span>
+              <PoopGlyph fill={fill} />
             </span>
           );
         })}

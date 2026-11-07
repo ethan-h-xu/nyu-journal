@@ -1,68 +1,54 @@
 import { useEffect, useId, useState } from "react";
-import type { FormEvent } from "react";
 import type { Building } from "../data/types";
-import { PoopRating } from "./PoopRating";
-import { FLOOR_MAX_LENGTH, NOTES_MAX_LENGTH } from "./types";
+import { EntryForm } from "./EntryForm";
+import { PoopScore } from "./PoopRating";
 import type { JournalEntry } from "./types";
 
-/** Turn the notes counter red once this close to the limit. */
-const NOTES_WARNING_LEFT = 20;
+/** Which entry the form is open for; null shows the log instead. */
+type Editing = "new" | { id: string } | null;
 
-/**
- * Cuts text to `max` characters. `maxLength` alone misses some input, like
- * text committed from an IME, and counts an emoji as two characters.
- */
-function limit(text: string, max: number): string {
-  const chars = Array.from(text);
-  return chars.length > max ? chars.slice(0, max).join("") : text;
+const dateFormat = new Intl.DateTimeFormat(undefined, {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+});
+
+/** Formats a YYYY-MM-DD date in the local time zone, so it doesn't shift a day. */
+function formatDate(iso: string): string {
+  const [year, month, day] = iso.split("-").map(Number);
+  return dateFormat.format(new Date(year, month - 1, day));
 }
 
-const charCount = (text: string) => Array.from(text).length;
-
-function today(): string {
-  const now = new Date();
-  const offset = now.getTimezoneOffset() * 60_000;
-  return new Date(now.getTime() - offset).toISOString().slice(0, 10);
-}
-
-function emptyEntry(): JournalEntry {
-  return { date: today(), floor: "", rating: 0, notes: "" };
-}
-
-interface Errors {
-  date?: string;
-  floor?: string;
-  notes?: string;
-}
-
-/** The inputs' own limits stop most of these; this catches the rest. */
-function validate(entry: JournalEntry): Errors {
-  const errors: Errors = {};
-  if (!entry.date) errors.date = "Pick a date.";
-  else if (entry.date > today()) errors.date = "That date hasn't happened yet.";
-  if (charCount(entry.floor) > FLOOR_MAX_LENGTH)
-    errors.floor = `Use ${FLOOR_MAX_LENGTH} characters or fewer.`;
-  if (charCount(entry.notes) > NOTES_MAX_LENGTH)
-    errors.notes = `Notes can be at most ${NOTES_MAX_LENGTH} characters.`;
-  return errors;
+/** Newest visit first; same-day entries keep the order they were added, newest first. */
+function sortNewestFirst(entries: readonly JournalEntry[]): JournalEntry[] {
+  return entries
+    .map((entry, index) => ({ entry, index }))
+    .sort((a, b) => b.entry.date.localeCompare(a.entry.date) || b.index - a.index)
+    .map(({ entry }) => entry);
 }
 
 interface BuildingPanelProps {
   building: Building;
-  entry: JournalEntry | undefined;
+  entries: readonly JournalEntry[];
+  /** Adds the entry, or replaces the one with the same id. */
   onSave: (entry: JournalEntry) => void;
-  onRemove: () => void;
+  onDelete: (entryId: string) => void;
   onClose: () => void;
 }
 
 /**
- * The journal entry for one building. Remount it (with `key`) when the building
- * changes, so the draft starts over.
+ * A building's journal: its log of past entries, or the form for a new one when
+ * it has none yet. Remount it (with `key`) when the building changes.
  */
-export function BuildingPanel({ building, entry, onSave, onRemove, onClose }: BuildingPanelProps) {
-  const [draft, setDraft] = useState<JournalEntry>(() => entry ?? emptyEntry());
+export function BuildingPanel({ building, entries, onSave, onDelete, onClose }: BuildingPanelProps) {
+  const [editing, setEditing] = useState<Editing>(null);
   const id = useId();
   const [title, ...otherNames] = building.names;
+
+  // With nothing logged yet there's no log to show, so go straight to the form.
+  const current: Editing = editing ?? (entries.length === 0 ? "new" : null);
+  const editedEntry =
+    current && current !== "new" ? entries.find((e) => e.id === current.id) : undefined;
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -72,16 +58,12 @@ export function BuildingPanel({ building, entry, onSave, onRemove, onClose }: Bu
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [onClose]);
 
-  const errors = validate(draft);
-  const hasErrors = Object.keys(errors).length > 0;
-  const notesLength = charCount(draft.notes);
-  const floorLength = charCount(draft.floor);
-
-  const submit = (event: FormEvent) => {
-    event.preventDefault();
-    if (hasErrors) return;
-    onSave({ ...draft, floor: draft.floor.trim(), notes: draft.notes.trim() });
-  };
+  const subtitle =
+    current === "new"
+      ? "New entry"
+      : current
+        ? "Edit entry"
+        : `${entries.length} ${entries.length === 1 ? "entry" : "entries"}`;
 
   return (
     <aside className="building-panel" aria-labelledby={`${id}-title`}>
@@ -91,93 +73,61 @@ export function BuildingPanel({ building, entry, onSave, onRemove, onClose }: Bu
           {otherNames.length > 0 && (
             <p className="building-panel-aka">Also: {otherNames.join(", ")}</p>
           )}
+          <p className="building-panel-subtitle">{subtitle}</p>
         </div>
         <button type="button" className="building-panel-close" onClick={onClose} aria-label="Close">
           ×
         </button>
       </header>
 
-      <form className="building-panel-form" onSubmit={submit} noValidate>
-        <div className="field-row">
-          <label className="field">
-            <span>Date</span>
-            <input
-              type="date"
-              required
-              max={today()}
-              value={draft.date}
-              aria-invalid={!!errors.date}
-              onChange={(e) => setDraft((d) => ({ ...d, date: e.target.value }))}
-            />
-            {errors.date && <small className="field-error">{errors.date}</small>}
-          </label>
-
-          <label className="field field-floor">
-            <span>Floor</span>
-            <input
-              type="text"
-              placeholder="e.g. 3, B1"
-              value={draft.floor}
-              aria-invalid={!!errors.floor}
-              onChange={(e) =>
-                setDraft((d) => ({ ...d, floor: limit(e.target.value, FLOOR_MAX_LENGTH) }))
-              }
-            />
-            {errors.floor ? (
-              <small className="field-error">{errors.floor}</small>
-            ) : (
-              <small className="field-hint">
-                {floorLength}/{FLOOR_MAX_LENGTH}
-              </small>
-            )}
-          </label>
-        </div>
-
-        <div className="field">
-          <span id={`${id}-rating`}>Rating</span>
-          <PoopRating
-            labelId={`${id}-rating`}
-            value={draft.rating}
-            onChange={(rating) => setDraft((d) => ({ ...d, rating }))}
-          />
-        </div>
-
-        <label className="field">
-          <span>Notes</span>
-          <textarea
-            rows={6}
-            value={draft.notes}
-            aria-invalid={!!errors.notes}
-            onChange={(e) =>
-              setDraft((d) => ({ ...d, notes: limit(e.target.value, NOTES_MAX_LENGTH) }))
-            }
-          />
-          {errors.notes ? (
-            <small className="field-error">{errors.notes}</small>
-          ) : (
-            <small
-              className={
-                NOTES_MAX_LENGTH - notesLength <= NOTES_WARNING_LEFT
-                  ? "field-hint field-hint-limit"
-                  : "field-hint"
-              }
-            >
-              {notesLength.toLocaleString()} / {NOTES_MAX_LENGTH.toLocaleString()}
-            </small>
-          )}
-        </label>
-
-        <div className="building-panel-actions">
-          {entry && (
-            <button type="button" className="button-secondary" onClick={onRemove}>
-              Remove
-            </button>
-          )}
-          <button type="submit" className="button-primary" disabled={hasErrors}>
-            {entry ? "Update entry" : "Add to journal"}
+      {current ? (
+        <EntryForm
+          key={current === "new" ? "new" : current.id}
+          entry={editedEntry}
+          onSave={(entry) => {
+            onSave(entry);
+            // A new entry closes the panel; an edit returns to the log.
+            if (current === "new") onClose();
+            else setEditing(null);
+          }}
+          onCancel={() => (entries.length > 0 ? setEditing(null) : onClose())}
+        />
+      ) : (
+        <div className="building-panel-body">
+          <button
+            type="button"
+            className="button-primary entry-new"
+            onClick={() => setEditing("new")}
+          >
+            + New entry
           </button>
+          <ol className="entry-log">
+            {sortNewestFirst(entries).map((entry) => (
+              <li key={entry.id} className="entry">
+                <div className="entry-meta">
+                  <time dateTime={entry.date}>{formatDate(entry.date)}</time>
+                  {entry.floor && <span className="entry-floor">Floor {entry.floor}</span>}
+                </div>
+                <PoopScore value={entry.rating} />
+                {entry.notes && <p className="entry-notes">{entry.notes}</p>}
+                <div className="entry-actions">
+                  <button type="button" onClick={() => setEditing({ id: entry.id })}>
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm("Delete this entry?")) onDelete(entry.id);
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
-      </form>
+      )}
     </aside>
   );
 }

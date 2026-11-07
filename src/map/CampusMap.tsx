@@ -2,7 +2,7 @@ import { memo, useCallback, useState } from "react";
 import { campusMap } from "../data/campusMap";
 import type { Building, Rect } from "../data/types";
 import { BuildingPanel } from "../journal/BuildingPanel";
-import type { JournalEntry } from "../journal/types";
+import type { Journal, JournalEntry } from "../journal/types";
 import { useBuildingClick } from "./useBuildingClick";
 import { useBuildingHover } from "./useBuildingHover";
 import type { HoverPoint } from "./useBuildingHover";
@@ -33,15 +33,17 @@ const TOOLTIP_OFFSET = 14;
 const TOOLTIP_FLIP_X = 300;
 const TOOLTIP_FLIP_Y = 200;
 
+const NO_ENTRIES: readonly JournalEntry[] = [];
+
 const buildingsById = new Map(campusMap.buildings.map((b) => [b.id, b]));
 
 interface MapShapesProps {
   selectedId: string | null;
-  entries: ReadonlyMap<string, JournalEntry>;
+  journal: Journal;
 }
 
-function buildingClass(id: string, { selectedId, entries }: MapShapesProps): string | undefined {
-  const classes = [entries.has(id) && "logged", id === selectedId && "selected"].filter(Boolean);
+function buildingClass(id: string, { selectedId, journal }: MapShapesProps): string | undefined {
+  const classes = [journal.has(id) && "logged", id === selectedId && "selected"].filter(Boolean);
   return classes.length > 0 ? classes.join(" ") : undefined;
 }
 
@@ -111,23 +113,26 @@ export function CampusMap() {
   const hoveredBuilding = hover && buildingsById.get(hover.buildingId);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [entries, setEntries] = useState<ReadonlyMap<string, JournalEntry>>(new Map());
+  const [journal, setJournal] = useState<Journal>(new Map());
   const selectedBuilding = selectedId ? buildingsById.get(selectedId) : undefined;
   const clickHandlers = useBuildingClick(setSelectedId);
   const closePanel = useCallback(() => setSelectedId(null), []);
 
-  const saveEntry = (id: string, entry: JournalEntry) => {
-    setEntries((current) => new Map(current).set(id, entry));
-    setSelectedId(null);
-  };
-  const removeEntry = (id: string) => {
-    setEntries((current) => {
+  const saveEntry = (buildingId: string, entry: JournalEntry) =>
+    setJournal((current) => {
+      const entries = current.get(buildingId) ?? [];
+      const exists = entries.some((e) => e.id === entry.id);
+      const next = exists ? entries.map((e) => (e.id === entry.id ? entry : e)) : [...entries, entry];
+      return new Map(current).set(buildingId, next);
+    });
+  const deleteEntry = (buildingId: string, entryId: string) =>
+    setJournal((current) => {
+      const remaining = (current.get(buildingId) ?? []).filter((e) => e.id !== entryId);
       const next = new Map(current);
-      next.delete(id);
+      if (remaining.length > 0) next.set(buildingId, remaining);
+      else next.delete(buildingId);
       return next;
     });
-    setSelectedId(null);
-  };
 
   return (
     <main className="map-page">
@@ -153,7 +158,7 @@ export function CampusMap() {
               </clipPath>
             </defs>
             <g transform={`translate(${view.x} ${view.y}) scale(${view.k})`}>
-              <MapShapes selectedId={selectedId} entries={entries} />
+              <MapShapes selectedId={selectedId} journal={journal} />
             </g>
           </svg>
         )}
@@ -165,9 +170,9 @@ export function CampusMap() {
         <BuildingPanel
           key={selectedBuilding.id}
           building={selectedBuilding}
-          entry={entries.get(selectedBuilding.id)}
+          entries={journal.get(selectedBuilding.id) ?? NO_ENTRIES}
           onSave={(entry) => saveEntry(selectedBuilding.id, entry)}
-          onRemove={() => removeEntry(selectedBuilding.id)}
+          onDelete={(entryId) => deleteEntry(selectedBuilding.id, entryId)}
           onClose={closePanel}
         />
       )}
