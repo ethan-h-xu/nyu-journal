@@ -22,10 +22,83 @@ body,
   margin: 0;
 }
 
-.map-page {
-  position: relative;
+.app {
+  display: flex;
+  flex-direction: column;
   height: 100%;
+}
+
+.app-body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.map-page {
+  position: absolute;
+  inset: 0;
   overflow: hidden;
+}
+
+/* The nav bar: brand on the left, views (Diary, later Friend feed) beside it,
+   and account controls (later Sign in) pushed to the right. */
+.nav-bar {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 24px;
+  height: 56px;
+  padding: 0 16px;
+  background: var(--building);
+  color: #fff;
+  font: 14px/1 system-ui, sans-serif;
+}
+
+.nav-brand {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.nav-items {
+  display: flex;
+  gap: 4px;
+  min-width: 0;
+}
+
+.nav-item {
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: rgb(255 255 255 / 80%);
+  font: 600 14px/1 system-ui, sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.nav-item:hover {
+  background: rgb(255 255 255 / 12%);
+  color: #fff;
+}
+
+.nav-item[aria-pressed="true"] {
+  background: #fff;
+  color: var(--building);
+}
+
+.nav-item:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.nav-account {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
 }
 
 .map-stage {
@@ -173,7 +246,7 @@ body,
   margin-top: 4px;
 }
 
-.building-panel {
+.side-panel {
   position: absolute;
   z-index: 2;
   top: 16px;
@@ -191,7 +264,7 @@ body,
   font: 14px/1.4 system-ui, sans-serif;
 }
 
-.building-panel-header {
+.side-panel-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -200,20 +273,20 @@ body,
   border-bottom: 1px solid var(--line);
 }
 
-.building-panel-header h2 {
+.side-panel-header h2 {
   margin: 0;
   color: var(--building);
   font-size: 20px;
   line-height: 1.25;
 }
 
-.building-panel-aka {
+.side-panel-aside {
   margin: 4px 0 0;
   color: var(--ink-soft);
   font-size: 12px;
 }
 
-.building-panel-close {
+.side-panel-close {
   flex: none;
   width: 32px;
   height: 32px;
@@ -227,12 +300,12 @@ body,
   cursor: pointer;
 }
 
-.building-panel-close:hover {
+.side-panel-close:hover {
   background: #f1f0f7;
   color: var(--ink);
 }
 
-.building-panel-body {
+.side-panel-body {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -242,7 +315,7 @@ body,
   overflow-y: auto;
 }
 
-.building-panel-subtitle {
+.side-panel-subtitle {
   margin: 6px 0 0;
   color: var(--ink-soft);
   font-size: 12px;
@@ -255,7 +328,7 @@ body,
   align-self: stretch;
 }
 
-.entry-log {
+.entry-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -265,12 +338,58 @@ body,
 }
 
 .entry {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: 12px 14px;
   border: 1px solid var(--line);
   border-radius: 10px;
+}
+
+.entry-heading {
+  margin: 0;
+  color: var(--building);
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+/* The building name in the diary; its hit area covers the whole card. */
+.entry-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.entry-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.entry:has(.entry-link):hover {
+  border-color: #c9c4e6;
+  background: #faf9fd;
+}
+
+.entry-link:focus-visible {
+  outline: none;
+}
+
+.entry:has(.entry-link:focus-visible) {
+  outline: 2px solid var(--building-hover);
+  outline-offset: 1px;
+}
+
+.empty-state {
+  margin: 24px 0;
+  color: var(--ink-soft);
+  text-align: center;
 }
 
 .entry-meta {
@@ -372,7 +491,7 @@ body,
 
 .field input:focus-visible,
 .field textarea:focus-visible,
-.building-panel button:focus-visible {
+.side-panel button:focus-visible {
   outline: 2px solid var(--building-hover);
   outline-offset: 1px;
 }
@@ -451,6 +570,13 @@ body,
   -webkit-user-select: none;
 }
 
+/* The emoji glyph sits about 0.1em low in its line box, so text centered beside
+   it looked high. Nudging the glyph up centers it in the box. */
+.poop-empty,
+.poop-fill {
+  transform: translateY(-0.1em);
+}
+
 .poop-empty {
   display: block;
   filter: grayscale(1);
@@ -470,7 +596,7 @@ body,
   font-variant-numeric: tabular-nums;
 }
 
-.building-panel-actions {
+.side-panel-actions {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
@@ -513,7 +639,7 @@ body,
 
 /* On narrow screens the panel becomes a sheet along the bottom. */
 @media (max-width: 600px) {
-  .building-panel {
+  .side-panel {
     top: auto;
     left: 0;
     right: 0;

@@ -1,8 +1,9 @@
-import { memo, useCallback, useState } from "react";
+import { memo, useImperativeHandle } from "react";
+import type { Ref } from "react";
+import { buildingsById } from "../data/buildings";
 import { campusMap } from "../data/campusMap";
 import type { Building, Rect } from "../data/types";
-import { BuildingPanel } from "../journal/BuildingPanel";
-import type { Journal, JournalEntry } from "../journal/types";
+import type { Journal } from "../journal/types";
 import { useBuildingClick } from "./useBuildingClick";
 import { useBuildingHover } from "./useBuildingHover";
 import type { HoverPoint } from "./useBuildingHover";
@@ -33,9 +34,36 @@ const TOOLTIP_OFFSET = 14;
 const TOOLTIP_FLIP_X = 300;
 const TOOLTIP_FLIP_Y = 200;
 
-const NO_ENTRIES: readonly JournalEntry[] = [];
+/** The smallest area, in map units, that focusing on a building zooms to. */
+const FOCUS_MIN_SIZE = 320;
 
-const buildingsById = new Map(campusMap.buildings.map((b) => [b.id, b]));
+/** The map area to show when focusing on a building: its bounds, padded out to a minimum. */
+function focusBounds(buildingId: string): Rect | null {
+  const path = document.getElementById(buildingId);
+  if (!(path instanceof SVGGraphicsElement)) return null;
+  const box = path.getBBox();
+  const width = Math.max(box.width, FOCUS_MIN_SIZE);
+  const height = Math.max(box.height, FOCUS_MIN_SIZE);
+  return {
+    x: box.x + box.width / 2 - width / 2,
+    y: box.y + box.height / 2 - height / 2,
+    width,
+    height,
+  };
+}
+
+export interface CampusMapHandle {
+  /** Pans and zooms to center a building. */
+  focusBuilding: (buildingId: string) => void;
+}
+
+interface CampusMapProps {
+  journal: Journal;
+  selectedId: string | null;
+  /** Called with the clicked building, or null for a click on empty map. */
+  onBuildingClick: (buildingId: string | null) => void;
+  ref?: Ref<CampusMapHandle>;
+}
 
 interface MapShapesProps {
   selectedId: string | null;
@@ -106,33 +134,25 @@ function BuildingTooltip({ building, point }: { building: Building; point: Hover
   );
 }
 
-export function CampusMap() {
-  const { view, elementRef, handlers, zoomIn, zoomOut, reset, canZoomIn, canZoomOut } =
+/** The map itself. Panels and journal state live in the app around it. */
+export function CampusMap({ journal, selectedId, onBuildingClick, ref }: CampusMapProps) {
+  const { view, elementRef, handlers, zoomIn, zoomOut, reset, focus, canZoomIn, canZoomOut } =
     useMapView(campusMap, getHome);
   const { hover, hoverHandlers } = useBuildingHover(view);
   const hoveredBuilding = hover && buildingsById.get(hover.buildingId);
 
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [journal, setJournal] = useState<Journal>(new Map());
-  const selectedBuilding = selectedId ? buildingsById.get(selectedId) : undefined;
-  const clickHandlers = useBuildingClick(setSelectedId);
-  const closePanel = useCallback(() => setSelectedId(null), []);
+  const clickHandlers = useBuildingClick(onBuildingClick);
 
-  const saveEntry = (buildingId: string, entry: JournalEntry) =>
-    setJournal((current) => {
-      const entries = current.get(buildingId) ?? [];
-      const exists = entries.some((e) => e.id === entry.id);
-      const next = exists ? entries.map((e) => (e.id === entry.id ? entry : e)) : [...entries, entry];
-      return new Map(current).set(buildingId, next);
-    });
-  const deleteEntry = (buildingId: string, entryId: string) =>
-    setJournal((current) => {
-      const remaining = (current.get(buildingId) ?? []).filter((e) => e.id !== entryId);
-      const next = new Map(current);
-      if (remaining.length > 0) next.set(buildingId, remaining);
-      else next.delete(buildingId);
-      return next;
-    });
+  useImperativeHandle(
+    ref,
+    () => ({
+      focusBuilding: (buildingId) => {
+        const bounds = focusBounds(buildingId);
+        if (bounds) focus(bounds);
+      },
+    }),
+    [focus],
+  );
 
   return (
     <main className="map-page">
@@ -165,16 +185,6 @@ export function CampusMap() {
       </div>
       {hover && hoveredBuilding && (
         <BuildingTooltip building={hoveredBuilding} point={hover.point} />
-      )}
-      {selectedBuilding && (
-        <BuildingPanel
-          key={selectedBuilding.id}
-          building={selectedBuilding}
-          entries={journal.get(selectedBuilding.id) ?? NO_ENTRIES}
-          onSave={(entry) => saveEntry(selectedBuilding.id, entry)}
-          onDelete={(entryId) => deleteEntry(selectedBuilding.id, entryId)}
-          onClose={closePanel}
-        />
       )}
       <div className="map-controls">
         <button type="button" onClick={zoomIn} disabled={!canZoomIn} aria-label="Zoom in">

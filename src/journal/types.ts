@@ -7,6 +7,8 @@ export const RATING_STEP = 0.5;
 /** One visit to a building. Mock data for now: kept in memory only. */
 export interface JournalEntry {
   id: string;
+  /** When the entry was written, in ms since the epoch. Orders same-day entries. */
+  createdAt: number;
   /** ISO date, YYYY-MM-DD. Required. */
   date: string;
   /** Free text, at most FLOOR_MAX_LENGTH characters. */

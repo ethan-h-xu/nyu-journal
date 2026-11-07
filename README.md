@@ -14,7 +14,10 @@ also work, and `0` returns to Washington Square Park.
 Hover over an NYU building to see its name. Buildings start greyed out; click
 one to add a journal entry (required date, floor, half-step 💩 rating, notes), which turns
 it purple. Clicking a logged building opens its log of past entries, where you
-can add, edit, or delete entries. Entries are mock data kept in memory and reset on
+can add, edit, or delete entries.
+
+**Diary** in the nav bar lists every entry across all buildings, newest first.
+Click one to fly the map to its building and open that building's log. Entries are mock data kept in memory and reset on
 reload.
 
 `src/data/campusMap.ts` is generated from the PDF by

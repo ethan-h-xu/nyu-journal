@@ -25,7 +25,7 @@ function today(): string {
 }
 
 function newEntry(): JournalEntry {
-  return { id: crypto.randomUUID(), date: today(), floor: "", rating: 0, notes: "" };
+  return { id: crypto.randomUUID(), createdAt: Date.now(), date: today(), floor: "", rating: 0, notes: "" };
 }
 
 interface Errors {
@@ -71,7 +71,7 @@ export function EntryForm({ entry, onSave, onCancel }: EntryFormProps) {
   };
 
   return (
-    <form className="building-panel-body" onSubmit={submit} noValidate>
+    <form className="side-panel-body" onSubmit={submit} noValidate>
       <div className="field-row">
         <label className="field">
           <span>
@@ -143,7 +143,7 @@ export function EntryForm({ entry, onSave, onCancel }: EntryFormProps) {
         )}
       </label>
 
-      <div className="building-panel-actions">
+      <div className="side-panel-actions">
         <button type="button" className="button-secondary" onClick={onCancel}>
           Cancel
         </button>

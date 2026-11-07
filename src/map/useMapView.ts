@@ -95,6 +95,15 @@ export function useMapView(map: Size, getHome: (viewport: Size) => Rect) {
   const zoomIn = useCallback(() => zoomFromCenter(BUTTON_ZOOM), [zoomFromCenter]);
   const zoomOut = useCallback(() => zoomFromCenter(1 / BUTTON_ZOOM), [zoomFromCenter]);
 
+  /** Animates to fit `bounds`, given in map coordinates. */
+  const focus = useCallback(
+    (bounds: Rect) => {
+      hasMoved.current = true;
+      animateTo((_, size) => fitBounds(bounds, map, size));
+    },
+    [animateTo, map],
+  );
+
   const reset = useCallback(() => {
     hasMoved.current = false;
     animateTo((_, size) => fitBounds(getHome(size), map, size));
@@ -273,6 +282,7 @@ export function useMapView(map: Size, getHome: (viewport: Size) => Rect) {
     zoomIn,
     zoomOut,
     reset,
+    focus,
     canZoomIn: !!view && view.k < MAX_ZOOM - 1e-6,
     canZoomOut: !!view && view.k > min + 1e-6,
     handlers: {
