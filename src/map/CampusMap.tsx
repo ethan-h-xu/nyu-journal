@@ -201,7 +201,7 @@ export function CampusMap({ journal, selectedId, onBuildingClick, ref }: CampusM
           title="Reset to the opening view"
         >
           <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
-            <path d="M3 6V3h3M13 6V3h-3M3 10v3h3M13 10v3h-3" />
+            <path d="M6 3v3H3M10 3v3h3M6 13v-3H3M10 13v-3h3" />
           </svg>
         </button>
       </div>
