@@ -747,6 +747,20 @@ body,
   overflow-wrap: anywhere;
 }
 
+.account-menu a {
+  padding: 9px 10px;
+  border-radius: 6px;
+  color: var(--ink);
+  font: 500 14px/1 system-ui, sans-serif;
+  text-decoration: none;
+}
+
+.account-menu a:hover,
+.account-menu a:focus-visible {
+  background: #f1f0f7;
+  outline: none;
+}
+
 .account-menu button {
   padding: 9px 10px;
   border: 0;
@@ -783,6 +797,10 @@ body,
 .panel-message .panel-message-fine {
   color: var(--ink-soft);
   font-size: 12px;
+}
+
+.panel-message-fine a {
+  color: var(--building-hover);
 }
 
 .toast {

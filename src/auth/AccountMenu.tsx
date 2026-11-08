@@ -68,6 +68,9 @@ export function AccountMenu({ auth, onSignIn, onSignOut, onDeleteAccount }: Acco
           >
             Sign out
           </button>
+          <a role="menuitem" href="/privacy.html">
+            Privacy policy
+          </a>
           <button
             type="button"
             role="menuitem"

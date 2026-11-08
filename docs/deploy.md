@@ -43,12 +43,23 @@ app, but only to URLs it allows.
 
 Google can take a few minutes to apply changes.
 
-## 3. Let your friends in
+## 3. Let people sign in
 
 While the Google app's audience is in **Testing**, only listed test users can
-sign in: add your friends' Google accounts under **Google Auth Platform →
-Audience → Test users**. Or press **Publish app** there; with only the basic
-name/email/picture scopes, Google doesn't require a review.
+sign in: add Google accounts under **Google Auth Platform → Audience → Test
+users**.
+
+To open it to everyone, publish the app. Google first needs these under
+**Branding**:
+- *App name* and *User support email*
+- *Application home page*: the production URL, e.g. `https://nyu-journal.vercel.app`
+- *Application privacy policy link*: `https://nyu-journal.vercel.app/privacy`
+  (served from `public/privacy.html`)
+- *Authorized domains*: the production domain, e.g. `nyu-journal.vercel.app`
+
+Then **Audience → Publish app**. With only the basic name/email/picture scopes
+there's no Google review and no user cap. Skip the logo unless you plan to
+verify a domain you own, since a logo triggers brand verification.
 
 ## 4. Turn on weekly backups (recommended)
 
