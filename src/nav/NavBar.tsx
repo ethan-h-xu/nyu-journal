@@ -1,18 +1,19 @@
-/** The views the nav bar opens. Add new ones (e.g. "feed") here and to NAV_ITEMS. */
+import type { ReactNode } from "react";
+
+/** The views the nav bar opens. Add new ones here and to NAV_ITEMS. */
 export type NavView = "diary";
 
-const NAV_ITEMS: { view: NavView; label: string }[] = [
-  { view: "diary", label: "Diary" },
-  // { view: "feed", label: "Friend feed" },
-];
+const NAV_ITEMS: { view: NavView; label: string }[] = [{ view: "diary", label: "Diary" }];
 
 interface NavBarProps {
   active: NavView | null;
   /** Called with a view to open it, or with the active view to close it. */
   onToggle: (view: NavView) => void;
+  /** Account controls on the right: Sign in, or the signed-in user's menu. */
+  account: ReactNode;
 }
 
-export function NavBar({ active, onToggle }: NavBarProps) {
+export function NavBar({ active, onToggle, account }: NavBarProps) {
   return (
     <header className="nav-bar">
       <span className="nav-brand">sh-tboxd</span>
@@ -29,8 +30,7 @@ export function NavBar({ active, onToggle }: NavBarProps) {
           </button>
         ))}
       </nav>
-      {/* Account controls, like Sign in, go on the right. */}
-      <div className="nav-account" />
+      <div className="nav-account">{account}</div>
     </header>
   );
 }

@@ -4,6 +4,7 @@ import { buildingsById } from "../data/buildings";
 import { campusMap } from "../data/campusMap";
 import type { Building, Rect } from "../data/types";
 import type { Journal } from "../journal/types";
+import { BUILDING_ID_ATTR } from "./buildingAt";
 import { useBuildingClick } from "./useBuildingClick";
 import { useBuildingHover } from "./useBuildingHover";
 import type { HoverPoint } from "./useBuildingHover";
@@ -39,7 +40,7 @@ const FOCUS_MIN_SIZE = 320;
 
 /** The map area to show when focusing on a building: its bounds, padded out to a minimum. */
 function focusBounds(buildingId: string): Rect | null {
-  const path = document.getElementById(buildingId);
+  const path = document.querySelector(`[${BUILDING_ID_ATTR}="${CSS.escape(buildingId)}"]`);
   if (!(path instanceof SVGGraphicsElement)) return null;
   const box = path.getBBox();
   const width = Math.max(box.width, FOCUS_MIN_SIZE);
@@ -94,7 +95,7 @@ const MapShapes = memo(function MapShapes(props: MapShapesProps) {
         {campusMap.buildings.map((building) => (
           <path
             key={building.id}
-            id={building.id}
+            data-building-id={building.id}
             d={building.d}
             className={buildingClass(building.id, props)}
           />

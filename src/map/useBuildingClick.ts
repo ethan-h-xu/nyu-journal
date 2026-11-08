@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import type { PointerEvent } from "react";
+import { buildingIdAt } from "./buildingAt";
 
 /** How far a pointer can move between press and release and still count as a click. */
 const CLICK_SLOP_PX = 6;
@@ -8,10 +9,6 @@ interface Press {
   pointerId: number;
   x: number;
   y: number;
-}
-
-function buildingIdAt(x: number, y: number): string | null {
-  return document.elementFromPoint(x, y)?.closest(".buildings path")?.id ?? null;
 }
 
 /**

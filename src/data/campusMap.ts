@@ -26,15 +26,15 @@ export const campusMap: CampusMapData = {
   ],
   "buildings": [
     {
-      "id": "building-1",
+      "id": "washington-square-village",
       "number": 90,
       "names": [
         "Washington Square Village"
       ],
-      "d": "M867.3 1622.54H1092.77V1652.69H867.3Z"
+      "d": "M867.3 1622.54H1092.77V1652.69H867.3Z M867.3 1502.97H1092.77V1533.12H867.3Z"
     },
     {
-      "id": "building-2",
+      "id": "dagostino-hall",
       "number": 85,
       "names": [
         "D’Agostino Hall"
@@ -42,23 +42,15 @@ export const campusMap: CampusMapData = {
       "d": "M572.77 1488.87H638.26V1517.19H572.77Z"
     },
     {
-      "id": "building-3",
+      "id": "silver-towers",
       "number": 94,
       "names": [
         "Silver Towers"
       ],
-      "d": "M946.64 1814.07H995.16V1845.06H946.64Z"
+      "d": "M946.64 1814.07H995.16V1845.06H946.64Z M995.33 1735.3H1027.48V1782.07H995.33Z"
     },
     {
-      "id": "building-4",
-      "number": 94,
-      "names": [
-        "Silver Towers"
-      ],
-      "d": "M995.33 1735.3H1027.48V1782.07H995.33Z"
-    },
-    {
-      "id": "building-5",
+      "id": "university-hall",
       "number": 5,
       "names": [
         "University Hall"
@@ -66,7 +58,7 @@ export const campusMap: CampusMapData = {
       "d": "M1286.34 455.17H1341.07V519.44H1286.34Z"
     },
     {
-      "id": "building-6",
+      "id": "school-of-professional-studies-sps",
       "number": 8,
       "names": [
         "School of Professional Studies (SPS)"
@@ -74,7 +66,7 @@ export const campusMap: CampusMapData = {
       "d": "M806.88 581.09H847.34V615.04H806.88Z"
     },
     {
-      "id": "building-7",
+      "id": "bronfman-center",
       "number": 15,
       "names": [
         "Bronfman Center"
@@ -82,7 +74,7 @@ export const campusMap: CampusMapData = {
       "d": "M831.33 771.89H858.79V806.26H831.33Z"
     },
     {
-      "id": "building-8",
+      "id": "second-street-residence",
       "number": 93,
       "names": [
         "Second Street Residence"
@@ -90,7 +82,7 @@ export const campusMap: CampusMapData = {
       "d": "M1735.13 1617.16L1632.44 1617.16L1606.74 1590.83L1735.13 1590.83L1735.13 1617.16"
     },
     {
-      "id": "building-9",
+      "id": "third-avenue-north-residence",
       "number": 13,
       "names": [
         "Third Avenue North Residence"
@@ -98,7 +90,7 @@ export const campusMap: CampusMapData = {
       "d": "M1561.42 641.9H1607.66V710.65H1561.42Z"
     },
     {
-      "id": "building-10",
+      "id": "barney-building",
       "number": 19,
       "names": [
         "Barney Building"
@@ -106,7 +98,7 @@ export const campusMap: CampusMapData = {
       "d": "M1635.18 901.86L1669.75 863.14L1703.3 863.14L1703.3 901.86L1635.18 901.86"
     },
     {
-      "id": "building-11",
+      "id": "puck-building",
       "number": 97,
       "names": [
         "Puck Building",
@@ -115,7 +107,7 @@ export const campusMap: CampusMapData = {
       "d": "M1471.88 2065.47L1344.99 2065.47L1344.99 1888.16L1439.12 1874.52L1471.88 2065.47"
     },
     {
-      "id": "building-12",
+      "id": "hayden-hall",
       "number": 91,
       "names": [
         "Hayden Hall"
@@ -123,7 +115,7 @@ export const campusMap: CampusMapData = {
       "d": "M1201.19 1557.88L1201.19 1488.87L1134.96 1488.87L1134.96 1506.55L1163.8 1506.55L1163.8 1541.38L1134.96 1541.38L1134.96 1557.88L1201.19 1557.88"
     },
     {
-      "id": "building-13",
+      "id": "194-196-mercer-street-627-broadway",
       "number": 96,
       "names": [
         "194-196 Mercer Street, 627 Broadway"
@@ -131,7 +123,7 @@ export const campusMap: CampusMapData = {
       "d": "M1134.92 1795.06H1201.15V1821.28H1134.92Z"
     },
     {
-      "id": "building-14",
+      "id": "meyer-hall",
       "number": 63,
       "names": [
         "Meyer Hall",
@@ -140,7 +132,7 @@ export const campusMap: CampusMapData = {
       "d": "M1134.96 1284.91H1201.19V1328.77H1134.96Z"
     },
     {
-      "id": "building-15",
+      "id": "10-astor-place",
       "number": 35,
       "names": [
         "10 Astor Place"
@@ -148,7 +140,7 @@ export const campusMap: CampusMapData = {
       "d": "M1257.17 1109.86L1257.17 1119.32L1341.4 1119.32L1341.4 1066.48L1257.17 1109.86"
     },
     {
-      "id": "building-16",
+      "id": "bookstore-and-computer-store",
       "number": 50,
       "names": [
         //"726 Broadway",
@@ -163,7 +155,7 @@ export const campusMap: CampusMapData = {
       "d": "M1238.34 1182.9H1341.4V1230.99H1238.34Z"
     },
     {
-      "id": "building-17",
+      "id": "411-lafayette-street",
       "number": 51,
       "names": [
         "411 Lafayette Street"
@@ -171,7 +163,7 @@ export const campusMap: CampusMapData = {
       "d": "M1369.26 1237.45H1422.94V1266.03H1369.26Z"
     },
     {
-      "id": "building-18",
+      "id": "studentlink-center",
       "number": 83,
       "names": [
         //"Admissions Office",
@@ -182,7 +174,7 @@ export const campusMap: CampusMapData = {
       "d": "M1369.26 1386.89H1452.15V1423.33H1369.26Z"
     },
     {
-      "id": "building-19",
+      "id": "22-washington-square-north",
       "number": 20,
       "names": [
         "22 Washington Square North"
@@ -190,7 +182,7 @@ export const campusMap: CampusMapData = {
       "d": "M617.73 1099.09H639.42V1156.07H617.73Z"
     },
     {
-      "id": "building-20",
+      "id": "19-washington-square-north-nyuad",
       "number": 21,
       "names": [
         "19 Washington Square North (NYUAD)"
@@ -198,7 +190,7 @@ export const campusMap: CampusMapData = {
       "d": "M661.1 1099.09H682.78V1156.07H661.1Z"
     },
     {
-      "id": "building-21",
+      "id": "lipton-hall",
       "number": 67,
       "names": [
         "Lipton Hall"
@@ -206,7 +198,7 @@ export const campusMap: CampusMapData = {
       "d": "M496.53 1284.88H544.91V1331.52H496.53Z"
     },
     {
-      "id": "building-22",
+      "id": "vanderbilt-hall",
       "number": 69,
       "names": [
         //"School of Law",
@@ -215,7 +207,7 @@ export const campusMap: CampusMapData = {
       "d": "M616.41 1386.89L616.41 1407.4L594.62 1407.4L594.62 1386.89L572.84 1386.89L572.84 1462.01L638.19 1462.01L638.19 1386.89L616.41 1386.89"
     },
     {
-      "id": "building-23",
+      "id": "kevorkian-center",
       "number": 70,
       "names": [
         "Kevorkian Center"
@@ -223,7 +215,7 @@ export const campusMap: CampusMapData = {
       "d": "M666.13 1386.89H688.56V1423.33H666.13Z"
     },
     {
-      "id": "building-24",
+      "id": "skirball-dept-of-hebrew-and-judaic-studies",
       "number": 71,
       "names": [
         //"King Juan Carlos I of Spain Center",
@@ -232,7 +224,7 @@ export const campusMap: CampusMapData = {
       "d": "M691.8 1386.89H713.68V1423.33H691.8Z"
     },
     {
-      "id": "building-25",
+      "id": "furman-hall",
       "number": 72,
       "names": [
         "Furman Hall"
@@ -240,7 +232,7 @@ export const campusMap: CampusMapData = {
       "d": "M666.13 1426.57H731.62V1462.01H666.13Z"
     },
     {
-      "id": "building-26",
+      "id": "kimmel-center-for-university-life",
       "number": 74,
       "names": [
         "Kimmel Center for University Life",
@@ -250,7 +242,7 @@ export const campusMap: CampusMapData = {
       "d": "M786.84 1386.89H824.98V1462.01H786.84Z"
     },
     {
-      "id": "building-27",
+      "id": "global-center-for-academic-and-spiritual-life-gcasl",
       "number": 73,
       "names": [
         "Global Center for Academic and Spiritual Life (GCASL)"
@@ -258,7 +250,7 @@ export const campusMap: CampusMapData = {
       "d": "M759.45 1386.89H783.6V1462.01H759.45Z"
     },
     {
-      "id": "building-28",
+      "id": "lillian-vernon-center",
       "number": 17,
       "names": [
         "Lillian Vernon Center"
@@ -266,7 +258,7 @@ export const campusMap: CampusMapData = {
       "d": "M454.42 833.12H477.97V867.07H454.42Z"
     },
     {
-      "id": "building-29",
+      "id": "casa-italiana-zerilli-marimo",
       "number": 10,
       "names": [
         "Casa Italiana Zerilli-Marimò"
@@ -274,7 +266,7 @@ export const campusMap: CampusMapData = {
       "d": "M612.55 641.9H634.86V675.86H612.55Z"
     },
     {
-      "id": "building-30",
+      "id": "rubin-hall",
       "number": 14,
       "names": [
         "Rubin Hall"
@@ -282,7 +274,7 @@ export const campusMap: CampusMapData = {
       "d": "M764.13 771.89H806.88V806.26H764.13Z"
     },
     {
-      "id": "building-31",
+      "id": "brittany-hall",
       "number": 16,
       "names": [
         "Brittany Hall"
@@ -290,7 +282,7 @@ export const campusMap: CampusMapData = {
       "d": "M1115.47 771.88L1175.21 771.88L1192.41 806.26L1115.47 806.26L1115.47 771.88"
     },
     {
-      "id": "building-32",
+      "id": "carlyle-court",
       "number": 2,
       "names": [
         "Carlyle Court"
@@ -298,7 +290,7 @@ export const campusMap: CampusMapData = {
       "d": "M882.68 259.48L847.46 259.48L847.46 328.23L882.68 328.23L882.68 310.83L918.34 310.83L918.34 276.88L882.68 276.88L882.68 259.48"
     },
     {
-      "id": "building-33",
+      "id": "palladium-athletic-facility",
       "number": 6,
       "names": [
         "Palladium Athletic Facility",
@@ -308,7 +300,7 @@ export const campusMap: CampusMapData = {
       "d": "M1390.61 455.15H1484.92V519.42H1390.61Z"
     },
     {
-      "id": "building-34",
+      "id": "665-broadway",
       "number": 92,
       "names": [
         "665 Broadway"
@@ -316,7 +308,7 @@ export const campusMap: CampusMapData = {
       "d": "M1134.96 1561.12H1201.19V1577.5H1134.96Z"
     },
     {
-      "id": "building-35",
+      "id": "coral-towers",
       "number": 3,
       "names": [
         "Coral Towers"
@@ -324,7 +316,7 @@ export const campusMap: CampusMapData = {
       "d": "M1559.01 385.38H1593.39V419.42H1559.01Z"
     },
     {
-      "id": "building-36",
+      "id": "founders-hall",
       "number": 12,
       "names": [
         "Founders Hall"
@@ -332,7 +324,7 @@ export const campusMap: CampusMapData = {
       "d": "M1376.76 641.9H1427.37V675.86H1376.76Z"
     },
     {
-      "id": "building-37",
+      "id": "la-maison-francaise",
       "number": 26,
       "names": [
         //"Institute of French Studies",
@@ -341,7 +333,7 @@ export const campusMap: CampusMapData = {
       "d": "M884.5 1122.38L918.33 1122.31L918.33 1099.09L884.5 1099.09L884.5 1122.38"
     },
     {
-      "id": "building-38",
+      "id": "silver-school-of-social-work",
       "number": 25,
       "names": [
         "Silver School of Social Work"
@@ -349,7 +341,7 @@ export const campusMap: CampusMapData = {
       "d": "M885.01 1125.77H918.33V1156.07H885.01Z"
     },
     {
-      "id": "building-39",
+      "id": "deutsches-haus",
       "number": 28,
       "names": [
         "Deutsches Haus"
@@ -357,7 +349,7 @@ export const campusMap: CampusMapData = {
       "d": "M893.62 1059.43H918.37V1084.69H893.62Z"
     },
     {
-      "id": "building-40",
+      "id": "africa-house",
       "number": 27,
       "names": [
         "Africa House"
@@ -365,7 +357,7 @@ export const campusMap: CampusMapData = {
       "d": "M865.61 1060.67H890.38V1084.69H865.61Z"
     },
     {
-      "id": "building-41",
+      "id": "14-east-4th-street-nyu-shanghai",
       "number": 82,
       "names": [
         "14 East 4th Street (NYU Shanghai)"
@@ -373,7 +365,7 @@ export const campusMap: CampusMapData = {
       "d": "M1238.34 1386.89H1342.51V1407.21H1238.34Z"
     },
     {
-      "id": "building-42",
+      "id": "laguardia-student-technology-center",
       "number": 89,
       "names": [
         //"Copy Central",
@@ -384,15 +376,7 @@ export const campusMap: CampusMapData = {
       "d": "M867.31 1548.91H898.58V1609.14H867.31Z"
     },
     {
-      "id": "building-43",
-      "number": 90,
-      "names": [
-        "Washington Square Village"
-      ],
-      "d": "M867.3 1502.97H1092.77V1533.12H867.3Z"
-    },
-    {
-      "id": "building-44",
+      "id": "warren-weaver-hall",
       "number": 80,
       "names": [
         //"Courant Institute of Mathematical Sciences",
@@ -401,7 +385,7 @@ export const campusMap: CampusMapData = {
       "d": "M1055.4 1386.86H1086.14V1461.99H1055.4Z"
     },
     {
-      "id": "building-45",
+      "id": "kaufman-management-center",
       "number": 77,
       "names": [
         //"Jeffrey S. Gould Welcome Center",
@@ -412,7 +396,7 @@ export const campusMap: CampusMapData = {
       "d": "M997.9 1462.01L946.24 1462.01L946.24 1386.94L997.9 1386.89L997.9 1462.01"
     },
     {
-      "id": "building-46",
+      "id": "tisch-hall",
       "number": 79,
       "names": [
         //"Stern School of Business, Undergraduate College",
@@ -421,7 +405,7 @@ export const campusMap: CampusMapData = {
       "d": "M1001.14 1425.54H1052.16V1461.99H1001.14Z"
     },
     {
-      "id": "building-47",
+      "id": "glucksman-ireland-house",
       "number": 22,
       "names": [
         "Glucksman Ireland House"
@@ -429,7 +413,7 @@ export const campusMap: CampusMapData = {
       "d": "M764.13 1099.07H788.31V1122.38H764.13Z"
     },
     {
-      "id": "building-48",
+      "id": "13-19-university-place",
       "number": 31,
       "names": [
         "13-19 University Place"
@@ -437,7 +421,7 @@ export const campusMap: CampusMapData = {
       "d": "M946.2 1024.33H977.31V1054.27H946.2Z"
     },
     {
-      "id": "building-49",
+      "id": "john-w-draper-program",
       "number": 29,
       "names": [
         "John W. Draper Program"
@@ -445,7 +429,7 @@ export const campusMap: CampusMapData = {
       "d": "M893.45 1024.33H925.03V1056.19H893.45Z"
     },
     {
-      "id": "building-50",
+      "id": "cantor-film-center",
       "number": 32,
       "names": [
         "Cantor Film Center"
@@ -453,7 +437,7 @@ export const campusMap: CampusMapData = {
       "d": "M980.55 1024.33H1011.69V1054.27H980.55Z"
     },
     {
-      "id": "building-51",
+      "id": "rufus-d-smith-hall",
       "number": 34,
       "names": [
         "Rufus D. Smith Hall"
@@ -461,7 +445,7 @@ export const campusMap: CampusMapData = {
       "d": "M980.11 1126.08H1011.69V1156.07H980.11Z"
     },
     {
-      "id": "building-52",
+      "id": "weinstein-hall",
       "number": 33,
       "names": [
         "Weinstein Hall"
@@ -469,7 +453,7 @@ export const campusMap: CampusMapData = {
       "d": "M946.18 1057.51H1011.68V1122.84H946.18Z"
     },
     {
-      "id": "building-53",
+      "id": "silver-center-for-arts-and-science",
       "number": 38,
       "names": [
         //"Grey Art Gallery",
@@ -478,7 +462,7 @@ export const campusMap: CampusMapData = {
       "d": "M946.2 1182.93H977.11V1258.05H946.2Z"
     },
     {
-      "id": "building-54",
+      "id": "waverly-building",
       "number": 39,
       "names": [
         "Waverly Building"
@@ -486,7 +470,7 @@ export const campusMap: CampusMapData = {
       "d": "M980.35 1182.93H1011.69V1218.87H980.35Z"
     },
     {
-      "id": "building-55",
+      "id": "brown-building",
       "number": 40,
       "names": [
         "Brown Building"
@@ -500,7 +484,7 @@ export const campusMap: CampusMapData = {
       "d": "M1062.8 1222.11H1084.98V1257.37H1062.8Z"
     },*/
     {
-      "id": "building-57",
+      "id": "kimball-hall",
       "number": 41,
       "names": [
         "Kimball Hall",
@@ -509,7 +493,7 @@ export const campusMap: CampusMapData = {
       "d": "M1039.95 1184.37H1059.56V1218.87H1039.95Z"
     },
     {
-      "id": "building-58",
+      "id": "center-for-genomics-and-systems-biology",
       "number": 42,
       "names": [
         "Center for Genomics and Systems Biology"
@@ -517,7 +501,7 @@ export const campusMap: CampusMapData = {
       "d": "M1062.8 1184.37H1084.98V1218.87H1062.8Z"
     },
     {
-      "id": "building-59",
+      "id": "philosophy-building",
       "number": 47,
       "names": [
         "Philosophy Building"
@@ -525,7 +509,7 @@ export const campusMap: CampusMapData = {
       "d": "M1134.96 1222.02H1153.31V1258.05H1134.96Z"
     },
     {
-      "id": "building-60",
+      "id": "tisch-school-of-the-arts",
       "number": 48,
       "names": [
         "Tisch School of the Arts"
@@ -533,7 +517,7 @@ export const campusMap: CampusMapData = {
       "d": "M1201.19 1215.56L1201.19 1215.56L1201.19 1182.93L1134.96 1182.93L1134.96 1218.79L1156.55 1218.79L1156.55 1238.42L1201.19 1238.42L1201.19 1215.56"
     },
     {
-      "id": "building-61",
+      "id": "gallatin-school-of-individualized-study",
       "number": 49,
       "names": [
         "Gallatin School of Individualized Study"
@@ -541,7 +525,7 @@ export const campusMap: CampusMapData = {
       "d": "M1156.55 1241.66H1201.19V1271.19H1156.55Z"
     },
     {
-      "id": "building-62",
+      "id": "pless-hall-joseph-and-violet",
       "number": 53,
       "names": [
         "Pless Hall, Joseph & Violet",
@@ -552,7 +536,7 @@ export const campusMap: CampusMapData = {
       "d": "M966.92 1312.99L966.92 1284.91L946.2 1284.91L946.2 1312.99L946.63 1312.99L946.63 1328.34L961.33 1328.34L966.92 1328.34L966.92 1312.99"
     },
     {
-      "id": "building-63",
+      "id": "pless-annex",
       "number": 54,
       "names": [
         "Pless Annex"
@@ -560,7 +544,7 @@ export const campusMap: CampusMapData = {
       "d": "M970.17 1284.91H988.46V1321.35H970.17Z"
     },
     {
-      "id": "building-64",
+      "id": "academic-resource-center",
       "number": 55,
       "names": [
         "Academic Resource Center",
@@ -569,7 +553,7 @@ export const campusMap: CampusMapData = {
       "d": "M991.7 1284.91H1011.69V1321.35H991.7Z"
     },
     {
-      "id": "building-65",
+      "id": "285-mercer-street",
       "number": 43,
       "names": [
         "285 Mercer Street"
@@ -577,7 +561,7 @@ export const campusMap: CampusMapData = {
       "d": "M1088.22 1184.37H1106.42V1218.87H1088.22Z"
     },
     {
-      "id": "building-66",
+      "id": "campus-safety",
       "number": 46,
       "names": [
         "Campus Safety",
@@ -586,7 +570,7 @@ export const campusMap: CampusMapData = {
       "d": "M1088.22 1222.11H1106.42V1257.37H1088.22Z"
     },
     {
-      "id": "building-67",
+      "id": "244-greene-street",
       "number": 44,
       "names": [
         "244 Greene Street"
@@ -594,7 +578,7 @@ export const campusMap: CampusMapData = {
       "d": "M1039.95 1222.11H1059.56V1257.37H1039.95Z"
     },
     {
-      "id": "building-68",
+      "id": "loewe-theater",
       "number": 57,
       "names": [
         //"Education Building",
@@ -603,7 +587,7 @@ export const campusMap: CampusMapData = {
       "d": "M980.61 1324.59H1011.69V1360.01H980.61Z"
     },
     {
-      "id": "building-69",
+      "id": "goddard-hall",
       "number": 56,
       "names": [
         // "80 Washington Square East Gallery",
@@ -618,7 +602,7 @@ export const campusMap: CampusMapData = {
       "d": "M1039.56 1284.91H1062.44V1321.83H1039.56Z"
     },*/
     {
-      "id": "building-71",
+      "id": "global-inclusion-diversity-and-strategic-innovation-office",
       "number": 61,
       "names": [
         "Global Inclusion, Diversity, and Strategic Innovation Office"
@@ -626,7 +610,7 @@ export const campusMap: CampusMapData = {
       "d": "M1039.56 1325.04H1059.05V1360.03H1039.56Z"
     },
     {
-      "id": "building-72",
+      "id": "bonomi-family-nyu-admissions-center",
       "number": 62,
       "names": [
         //"25 West 4th Street",
@@ -635,7 +619,7 @@ export const campusMap: CampusMapData = {
       "d": "M1062.29 1325.04H1083.29V1360.03H1062.29Z"
     },
     {
-      "id": "building-73",
+      "id": "19-west-4th-street",
       "number": 60,
       "names": [
         "19 West 4th Street"
@@ -643,7 +627,7 @@ export const campusMap: CampusMapData = {
       "d": "M1086.53 1284.91H1107.1V1360.03H1086.53Z"
     },
     {
-      "id": "building-74",
+      "id": "arthur-l-carter-hall",
       "number": 59,
       "names": [
         "Arthur L Carter Hall"
@@ -651,7 +635,7 @@ export const campusMap: CampusMapData = {
       "d": "M1065.68 1284.91H1083.29V1321.8H1065.68Z"
     },
     {
-      "id": "building-75",
+      "id": "20-cooper-square",
       "number": 52,
       "names": [
         "20 Cooper Square"
@@ -659,7 +643,7 @@ export const campusMap: CampusMapData = {
       "d": "M1561.57 1297.21L1426.14 1297.21L1426.14 1237.41L1540.03 1237.41L1561.57 1297.21"
     },
     {
-      "id": "building-76",
+      "id": "111-113-second-avenue",
       "number": 37,
       "names": [
         "111-113 Second Avenue"
@@ -667,7 +651,7 @@ export const campusMap: CampusMapData = {
       "d": "M1704.65 1131.86H1732.76V1159.27H1704.65Z"
     },
     {
-      "id": "building-77",
+      "id": "seventh-street-residence",
       "number": 36,
       "names": [
         "Seventh Street Residence"
@@ -675,7 +659,7 @@ export const campusMap: CampusMapData = {
       "d": "M1673.56 1114.95H1701.41V1142.36H1673.56Z"
     },
     {
-      "id": "building-78",
+      "id": "wilf-hall",
       "number": 68,
       "names": [
         // "Provincetown Playhouse",
@@ -684,7 +668,7 @@ export const campusMap: CampusMapData = {
       "d": "M517.51 1400.94H544.97V1437.38H517.51Z"
     },
     {
-      "id": "building-79",
+      "id": "bobst-library",
       "number": 75,
       "names": [
         "Bobst Library"
@@ -692,7 +676,7 @@ export const campusMap: CampusMapData = {
       "d": "M852.84 1386.89H918.34V1462.01H852.84Z"
     },
     {
-      "id": "building-80",
+      "id": "130-macdougal-street",
       "number": 86,
       "names": [
         "130 MacDougal Street"
@@ -700,23 +684,15 @@ export const campusMap: CampusMapData = {
       "d": "M572.77 1520.43H603.19V1537.98H572.77Z"
     },
     {
-      "id": "building-81",
+      "id": "105-east-17th-street",
       "number": 1,
       "names": [
         "105 East 17th Street"
       ],
-      "d": "M1202.74 107.23H1247.67V137.07H1202.74Z"
+      "d": "M1202.74 107.23H1247.67V137.07H1202.74Z M1225.2 73.07H1270.13V137.07H1225.2Z"
     },
     {
-      "id": "building-82",
-      "number": 1,
-      "names": [
-        "105 East 17th Street"
-      ],
-      "d": "M1225.2 73.07H1270.13V137.07H1225.2Z"
-    },
-    {
-      "id": "building-83",
+      "id": "faculty-of-arts-and-science",
       "number": 24,
       "names": [
         "Faculty of Arts and Science"
@@ -724,7 +700,7 @@ export const campusMap: CampusMapData = {
       "d": "M827.25 1125.77H881.77V1155.51H827.25Z"
     },
     {
-      "id": "building-84",
+      "id": "graduate-school-of-arts-and-science",
       "number": 23,
       "names": [
         "Graduate School of Arts and Science"
@@ -732,7 +708,7 @@ export const campusMap: CampusMapData = {
       "d": "M764.81 1131.46H799.52V1156.12H764.81Z"
     },
     {
-      "id": "building-85",
+      "id": "alumni-hall",
       "number": 18,
       "names": [
         "Alumni Hall"
@@ -740,7 +716,7 @@ export const campusMap: CampusMapData = {
       "d": "M1558.05 828.42H1602.97V904.08H1558.05Z"
     },
     {
-      "id": "building-86",
+      "id": "404-fitness",
       "number": 65,
       "names": [
         "404 Fitness"
@@ -748,7 +724,7 @@ export const campusMap: CampusMapData = {
       "d": "M1283 1280.37H1340.63V1313.45H1283Z"
     },
     {
-      "id": "building-87",
+      "id": "60-fifth-avenue",
       "number": 7,
       "names": [
         "60 Fifth Avenue"
@@ -756,7 +732,7 @@ export const campusMap: CampusMapData = {
       "d": "M680.41 580.98H726.25V614.93H680.41Z"
     },
     {
-      "id": "building-88",
+      "id": "school-of-global-public-health",
       "number": 64,
       "names": [
         "School of Global Public Health"
@@ -764,7 +740,7 @@ export const campusMap: CampusMapData = {
       "d": "M1236.09 1295.78H1283V1313.45H1236.09Z"
     },
     {
-      "id": "building-89",
+      "id": "john-a-paulson-center",
       "number": 95,
       "names": [
         "John A. Paulson Center"
@@ -772,7 +748,7 @@ export const campusMap: CampusMapData = {
       "d": "M1047.36 1695.2H1107.1V1867.68H1047.36Z"
     },
     {
-      "id": "building-90",
+      "id": "thirteenth-street-residence",
       "number": 4,
       "names": [
         "Thirteenth Street Residence"

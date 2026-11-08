@@ -6,11 +6,16 @@ export interface Rect {
 }
 
 export interface Building {
+  /**
+   * A permanent slug, e.g. "bobst-library". Journal entries are stored against
+   * it, so never change or reuse one once entries exist.
+   */
   id: string;
   /** The building's number on the PDF map. */
   number: number;
   /** The names the PDF's index lists for this number. Unnamed buildings aren't supported. */
   names: [string, ...string[]];
+  /** The outline; one subpath per shape for buildings drawn as several. */
   d: string;
 }
 

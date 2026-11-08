@@ -1,4 +1,8 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { ReactNode } from "react";
+import { AccountMenu } from "./auth/AccountMenu";
+import { SignInPrompt } from "./auth/SignInPrompt";
+import { useAuth } from "./auth/useAuth";
 import { buildingsById } from "./data/buildings";
 import { DiaryPanel } from "./diary/DiaryPanel";
 import { BuildingPanel } from "./journal/BuildingPanel";
@@ -8,16 +12,29 @@ import { CampusMap } from "./map/CampusMap";
 import type { CampusMapHandle } from "./map/CampusMap";
 import { NavBar } from "./nav/NavBar";
 import type { NavView } from "./nav/NavBar";
+import { SidePanel } from "./ui/SidePanel";
+import { Toast } from "./ui/Toast";
 
 /** What the side panel over the map shows: one building's journal, or a nav view. */
 type Panel = { kind: "building"; buildingId: string } | { kind: NavView } | null;
 
 const NO_ENTRIES: readonly JournalEntry[] = [];
 
+const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
+
 export function App() {
-  const { journal, saveEntry, deleteEntry } = useJournal();
+  const [toast, setToast] = useState<string | null>(null);
+  const dismissToast = useCallback(() => setToast(null), []);
+
+  const { auth, signIn, signOut, deleteAccount } = useAuth();
+  const userId = auth.status === "signedIn" ? auth.user.id : null;
+  const { journal, status, retry, saveEntry, deleteEntry } = useJournal(userId, setToast);
+
   const [panel, setPanel] = useState<Panel>(null);
   const mapRef = useRef<CampusMapHandle>(null);
+
+  // A different account (or none) shouldn't see the last one's open panel.
+  useEffect(() => setPanel(null), [userId]);
 
   const closePanel = useCallback(() => setPanel(null), []);
   const openBuilding = useCallback(
@@ -25,6 +42,40 @@ export function App() {
       setPanel(buildingId ? { kind: "building", buildingId } : null),
     [],
   );
+
+  const handleSignIn = () =>
+    signIn().catch((error) => setToast(`Couldn't sign in: ${errorMessage(error)}`));
+  const handleSignOut = () =>
+    signOut().catch((error) => setToast(`Couldn't sign out: ${errorMessage(error)}`));
+  const handleDeleteAccount = () => {
+    const confirmed = window.confirm(
+      "Delete your account and every diary entry in it? This can't be undone.",
+    );
+    if (!confirmed) return;
+    deleteAccount().catch((error) =>
+      setToast(`Couldn't delete your account: ${errorMessage(error)}`),
+    );
+  };
+
+  /**
+   * What a journal panel shows instead of its contents while signed out,
+   * loading, or failed to load; null once the journal is ready.
+   */
+  const gate: ReactNode =
+    auth.status === "signedOut" ? (
+      <SignInPrompt onSignIn={handleSignIn} />
+    ) : auth.status === "loading" || status === "loading" || status === "signedOut" ? (
+      <div className="side-panel-body panel-message">
+        <p>Loading your diary…</p>
+      </div>
+    ) : status === "error" ? (
+      <div className="side-panel-body panel-message">
+        <p>Your diary couldn't be loaded.</p>
+        <button type="button" className="button-secondary" onClick={retry}>
+          Try again
+        </button>
+      </div>
+    ) : null;
 
   const selectedId = panel?.kind === "building" ? panel.buildingId : null;
   const selectedBuilding = selectedId ? buildingsById.get(selectedId) : undefined;
@@ -35,6 +86,14 @@ export function App() {
       <NavBar
         active={activeView}
         onToggle={(view) => setPanel((current) => (current?.kind === view ? null : { kind: view }))}
+        account={
+          <AccountMenu
+            auth={auth}
+            onSignIn={handleSignIn}
+            onSignOut={handleSignOut}
+            onDeleteAccount={handleDeleteAccount}
+          />
+        }
       />
       <div className="app-body">
         <CampusMap
@@ -43,27 +102,38 @@ export function App() {
           selectedId={selectedId}
           onBuildingClick={openBuilding}
         />
-        {selectedBuilding && (
-          <BuildingPanel
-            key={selectedBuilding.id}
-            building={selectedBuilding}
-            entries={journal.get(selectedBuilding.id) ?? NO_ENTRIES}
-            onSave={(entry) => saveEntry(selectedBuilding.id, entry)}
-            onDelete={(entryId) => deleteEntry(selectedBuilding.id, entryId)}
-            onClose={closePanel}
-          />
-        )}
-        {panel?.kind === "diary" && (
-          <DiaryPanel
-            journal={journal}
-            buildingsById={buildingsById}
-            onOpenBuilding={(buildingId) => {
-              openBuilding(buildingId);
-              mapRef.current?.focusBuilding(buildingId);
-            }}
-            onClose={closePanel}
-          />
-        )}
+        {selectedBuilding &&
+          (gate ? (
+            <SidePanel title={selectedBuilding.names[0]} onClose={closePanel}>
+              {gate}
+            </SidePanel>
+          ) : (
+            <BuildingPanel
+              key={selectedBuilding.id}
+              building={selectedBuilding}
+              entries={journal.get(selectedBuilding.id) ?? NO_ENTRIES}
+              onSave={(entry) => void saveEntry(selectedBuilding.id, entry)}
+              onDelete={(entryId) => void deleteEntry(selectedBuilding.id, entryId)}
+              onClose={closePanel}
+            />
+          ))}
+        {panel?.kind === "diary" &&
+          (gate ? (
+            <SidePanel title="Diary" onClose={closePanel}>
+              {gate}
+            </SidePanel>
+          ) : (
+            <DiaryPanel
+              journal={journal}
+              buildingsById={buildingsById}
+              onOpenBuilding={(buildingId) => {
+                openBuilding(buildingId);
+                mapRef.current?.focusBuilding(buildingId);
+              }}
+              onClose={closePanel}
+            />
+          ))}
+        {toast && <Toast message={toast} onDismiss={dismissToast} />}
       </div>
     </div>
   );

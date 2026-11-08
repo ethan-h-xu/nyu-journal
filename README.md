@@ -17,8 +17,14 @@ it purple. Clicking a logged building opens its log of past entries, where you
 can add, edit, or delete entries.
 
 **Diary** in the nav bar lists every entry across all buildings, newest first.
-Click one to fly the map to its building and open that building's log. Entries are mock data kept in memory and reset on
-reload.
+Click one to fly the map to its building and open that building's log.
+
+Sign in with Google to keep a diary; entries are stored in Supabase and are
+private to each account. Signed out, you can still browse the map.
+
+Setup: [docs/supabase-setup.md](docs/supabase-setup.md) (database and Google
+sign-in), then [docs/deploy.md](docs/deploy.md) (Vercel and backups). For local
+development, copy `.env.example` to `.env.local` and fill it in.
 
 `src/data/campusMap.ts` is generated from the PDF by
 `scripts/extract_campus_map.py` (requires `pip install pymupdf`).

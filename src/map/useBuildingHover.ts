@@ -1,5 +1,6 @@
 import { useLayoutEffect, useState } from "react";
 import type { PointerEvent } from "react";
+import { buildingIdAt } from "./buildingAt";
 import type { View } from "./view";
 
 export interface HoverPoint {
@@ -17,8 +18,7 @@ export function useBuildingHover(view: View | null) {
   const [buildingId, setBuildingId] = useState<string | null>(null);
 
   useLayoutEffect(() => {
-    const element = point && document.elementFromPoint(point.x, point.y);
-    setBuildingId(element?.closest(".buildings path")?.id ?? null);
+    setBuildingId(point && buildingIdAt(point.x, point.y));
   }, [point, view]);
 
   return {
