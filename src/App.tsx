@@ -11,12 +11,19 @@ import { useJournal } from "./journal/useJournal";
 import { CampusMap } from "./map/CampusMap";
 import type { CampusMapHandle } from "./map/CampusMap";
 import { NavBar } from "./nav/NavBar";
+import { ProfilePanel } from "./profile/ProfilePanel";
+import { UsernameSetup } from "./profile/UsernameSetup";
+import { useProfile } from "./profile/useProfile";
 import type { NavView } from "./nav/NavBar";
 import { SidePanel } from "./ui/SidePanel";
 import { Toast } from "./ui/Toast";
 
-/** What the side panel over the map shows: one building's journal, or a nav view. */
-type Panel = { kind: "building"; buildingId: string } | { kind: NavView } | null;
+/** What the side panel over the map shows: a building's journal, a profile, or a nav view. */
+type Panel =
+  | { kind: "building"; buildingId: string }
+  | { kind: "profile" }
+  | { kind: NavView }
+  | null;
 
 const NO_ENTRIES: readonly JournalEntry[] = [];
 
@@ -29,6 +36,17 @@ export function App() {
   const { auth, signIn, signOut, deleteAccount } = useAuth();
   const userId = auth.status === "signedIn" ? auth.user.id : null;
   const { journal, status, retry, saveEntry, deleteEntry } = useJournal(userId, setToast);
+  const {
+    profile,
+    status: profileStatus,
+    retry: retryProfile,
+    createProfile,
+    updateProfile,
+  } = useProfile(userId);
+
+  useEffect(() => {
+    if (profileStatus === "error") setToast("Couldn't load your profile.");
+  }, [profileStatus]);
 
   const [panel, setPanel] = useState<Panel>(null);
   const mapRef = useRef<CampusMapHandle>(null);
@@ -79,7 +97,8 @@ export function App() {
 
   const selectedId = panel?.kind === "building" ? panel.buildingId : null;
   const selectedBuilding = selectedId ? buildingsById.get(selectedId) : undefined;
-  const activeView = panel && panel.kind !== "building" ? panel.kind : null;
+  const activeView =
+    panel && panel.kind !== "building" && panel.kind !== "profile" ? panel.kind : null;
 
   return (
     <div className="app">
@@ -89,6 +108,8 @@ export function App() {
         account={
           <AccountMenu
             auth={auth}
+            username={profile?.username ?? null}
+            onOpenProfile={() => setPanel({ kind: "profile" })}
             onSignIn={handleSignIn}
             onSignOut={handleSignOut}
             onDeleteAccount={handleDeleteAccount}
@@ -133,8 +154,30 @@ export function App() {
               onClose={closePanel}
             />
           ))}
+        {panel?.kind === "profile" &&
+          (profile ? (
+            <ProfilePanel profile={profile} onSave={updateProfile} onClose={closePanel} />
+          ) : (
+            <SidePanel title="Profile" onClose={closePanel}>
+              <div className="side-panel-body panel-message">
+                {profileStatus === "error" ? (
+                  <>
+                    <p>Your profile couldn't be loaded.</p>
+                    <button type="button" className="button-secondary" onClick={retryProfile}>
+                      Try again
+                    </button>
+                  </>
+                ) : (
+                  <p>Loading your profile…</p>
+                )}
+              </div>
+            </SidePanel>
+          ))}
         {toast && <Toast message={toast} onDismiss={dismissToast} />}
       </div>
+      {profileStatus === "missing" && (
+        <UsernameSetup onCreate={createProfile} onSignOut={handleSignOut} />
+      )}
     </div>
   );
 }
