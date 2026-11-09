@@ -298,10 +298,12 @@ body,
   font-size: 12px;
 }
 
+/* Header buttons are 32px; the -3.5px margins center them on the title's 25px first line. */
 .side-panel-close {
   flex: none;
   width: 32px;
   height: 32px;
+  margin: -3.5px 0;
   padding: 0;
   border: 0;
   border-radius: 50%;
@@ -1152,7 +1154,7 @@ body,
   flex: none;
   width: 32px;
   height: 32px;
-  margin: -2px -4px 0 -8px;
+  margin: -3.5px -4px -3.5px -8px;
   padding: 0 0 3px;
   border: 0;
   border-radius: 50%;
@@ -1175,9 +1177,10 @@ body,
   margin: 0;
 }
 
+/* Sized to their labels (then sharing what's left), so "Last 30 days" fits on one line. */
 .profile-stats > div {
   display: flex;
-  flex: 1;
+  flex: 1 1 auto;
   flex-direction: column-reverse;
   gap: 2px;
   padding: 10px 12px;
@@ -1187,6 +1190,7 @@ body,
 
 .profile-stats dt {
   color: var(--ink-soft);
+  white-space: nowrap;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -1275,32 +1279,50 @@ body,
   font-variant-numeric: tabular-nums;
 }
 
-/* Heart plus a count that lists who liked it. */
+/* Heart plus a count that lists who liked it, shown as one pill. */
 .like {
   position: relative;
   z-index: 1;
   display: inline-flex;
   align-items: center;
+  border-radius: 999px;
+}
+
+/* With a count to click, the pill's hover covers both the heart and the count. */
+.like:has(.like-count-button):has(.like-button:not(:disabled)):hover {
+  background: #fdecee;
+}
+
+/* No min-width or right padding, so the count sits right beside the heart. */
+.like:has(.like-count-button) .like-button {
+  min-width: 0;
+  padding-right: 0;
+}
+
+.like:has(.like-count-button) .like-button:hover:not(:disabled) {
+  background: none;
+}
+
+.like:has(.like-count-button):hover .like-button:not(:disabled) {
+  color: #d81b60;
 }
 
 .like-count-button {
   height: 28px;
-  margin-left: -6px;
-  padding: 0 8px;
+  padding: 0 8px 0 6px;
   border: 0;
-  border-radius: 999px;
+  border-radius: 0 999px 999px 0;
   background: none;
-  color: var(--ink-soft);
+  color: var(--ink);
   font: 600 13px/1 system-ui, sans-serif;
-  text-decoration: underline dotted;
   text-underline-offset: 3px;
   cursor: pointer;
 }
 
+/* Only the count shows who liked it, so only it underlines. */
 .like-count-button:hover,
 .like-count-button[aria-expanded="true"] {
-  background: #f1f0f7;
-  color: var(--ink);
+  text-decoration: underline dotted;
 }
 
 .likers-popover {
