@@ -206,7 +206,7 @@ export function App() {
               : undefined
           }
           onToggle={(view) => {
-            // Its own button again closes it, like ×.
+            // Its own button again closes it, like Ã—.
             if (activeView === view) return closePanel();
             navigate(view === "profile" ? { kind: "profile", userId } : { kind: view });
             // Opening the feed from the nav shows the latest; coming back from a profile doesn't.
