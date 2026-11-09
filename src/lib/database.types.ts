@@ -50,6 +50,39 @@ export type Database = {
         }
         Relationships: []
       }
+      entry_likes: {
+        Row: {
+          created_at: string
+          entry_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          entry_id: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          entry_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entry_likes_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "entries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "entry_likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       friendships: {
         Row: {
           addressee_id: string
@@ -119,6 +152,14 @@ export type Database = {
     }
     Functions: {
       delete_my_account: { Args: never; Returns: undefined }
+      entry_like_summaries: {
+        Args: { entry_ids: string[] }
+        Returns: {
+          entry_id: string
+          like_count: number
+          liked_by_me: boolean
+        }[]
+      }
       is_friend_of_me: { Args: { other: string }; Returns: boolean }
       remove_friend: { Args: { other: string }; Returns: undefined }
       respond_to_friend_request: {

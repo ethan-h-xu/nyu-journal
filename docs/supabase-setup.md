@@ -99,6 +99,13 @@ user; writable only by its owner.
 friendships. Nobody writes the table directly; the app calls
 `send_friend_request`, `respond_to_friend_request` and `remove_friend`.
 `is_friend_of_me(other)` backs the friend-read policies.
+
+`public.entry_likes`, one row per (entry, user who liked it). Users can like
+entries they can read, remove their own likes, and read their own like rows
+plus the likes on their own entries, so only an entry's author sees who liked
+it. `entry_like_summaries(entry_ids)` returns each
+entry's like count and whether the caller liked it, for entries the caller can
+read.
 `supabase/tests/friendships_check.sql` checks these rules without changing
 anything.
 

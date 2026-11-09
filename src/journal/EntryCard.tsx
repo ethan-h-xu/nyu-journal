@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { LikeButton } from "../likes/LikeButton";
 import { formatDate } from "./format";
 import { PoopScore } from "./PoopRating";
 import type { JournalEntry } from "./types";
@@ -11,7 +12,10 @@ interface EntryCardProps {
   actions?: ReactNode;
 }
 
-/** One journal entry, as shown in a building's log and in the diary. */
+/**
+ * One journal entry, as shown in a building's log, the diary, the feed and
+ * profiles. Has a like button wherever likes are available (see LikesContext).
+ */
 export function EntryCard({ entry, heading, actions }: EntryCardProps) {
   return (
     <article className="entry">
@@ -20,7 +24,10 @@ export function EntryCard({ entry, heading, actions }: EntryCardProps) {
         <time dateTime={entry.date}>{formatDate(entry.date)}</time>
         {entry.floor && <span className="entry-floor">Floor {entry.floor}</span>}
       </div>
-      <PoopScore value={entry.rating} />
+      <div className="entry-score-row">
+        <PoopScore value={entry.rating} />
+        <LikeButton entryId={entry.id} />
+      </div>
       {entry.notes && <p className="entry-notes">{entry.notes}</p>}
       {actions && <div className="entry-actions">{actions}</div>}
     </article>

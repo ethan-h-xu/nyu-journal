@@ -6,6 +6,7 @@ import { FriendsSection } from "../friends/FriendsSection";
 import type { Friends } from "../friends/useFriends";
 import { compareNewestFirst, daysAgo } from "../journal/format";
 import type { Journal } from "../journal/types";
+import { useLikesContext } from "../likes/useLikes";
 import { SidePanel } from "../ui/SidePanel";
 import { EditProfileForm } from "./EditProfileForm";
 import { ProfileActivity, buildingName } from "./ProfileActivity";
@@ -136,6 +137,16 @@ function OtherProfile({
   // Only friends can see entries and friend lists, so only load them for friends.
   const isFriend = friends.relations.get(userId)?.kind === "friend";
   const activity = useUserActivity(isFriend ? userId : null);
+  // Fresh like counts for their entries whenever a page loads.
+  const loadLikes = useLikesContext()?.load;
+  const activityItems = activity.pages.items;
+  useEffect(() => {
+    if (loadLikes)
+      void loadLikes(
+        activityItems.map((item) => item.entry.id),
+        true,
+      );
+  }, [activityItems, loadLikes]);
 
   if (state.status !== "ready") {
     return (

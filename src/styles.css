@@ -1217,3 +1217,113 @@ body,
   left: 0;
   height: 8px;
 }
+
+.entry-score-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* The .like wrapper sits above a card-wide .entry-link, so these stay clickable. */
+.like-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 36px;
+  height: 28px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--ink-soft);
+  font: 600 13px/1 system-ui, sans-serif;
+  cursor: pointer;
+}
+
+.like-button > span[aria-hidden] {
+  font-size: 17px;
+}
+
+.like-button:hover:not(:disabled) {
+  background: #fdecee;
+  color: #d81b60;
+}
+
+.like-button[aria-pressed="true"] {
+  color: #d81b60;
+}
+
+.like-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.like-count {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Heart plus, on your own entries, a count that lists who liked it. */
+.like {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+}
+
+.like-count-button {
+  height: 28px;
+  margin-left: -6px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--ink-soft);
+  font: 600 13px/1 system-ui, sans-serif;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.like-count-button:hover,
+.like-count-button[aria-expanded="true"] {
+  background: #f1f0f7;
+  color: var(--ink);
+}
+
+.likers-popover {
+  position: absolute;
+  z-index: 2;
+  top: calc(100% + 4px);
+  right: 0;
+  width: 200px;
+  max-height: 240px;
+  padding: 10px 12px;
+  overflow-y: auto;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 4px 20px rgb(0 0 0 / 20%);
+}
+
+.likers-popover ul {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.likers-title {
+  margin: 0 0 8px;
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Above later cards' hearts while the list is open. */
+.like:has(.likers-popover) {
+  z-index: 3;
+}

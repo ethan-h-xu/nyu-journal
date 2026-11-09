@@ -19,6 +19,10 @@ can add, edit, or delete entries.
 **Diary** in the nav bar lists every entry across all buildings, newest first.
 Click one to fly the map to its building and open that building's log.
 
+Entries everywhere have a ♡ like button and count. You can like your own
+entries and your friends'; everyone sees counts, and only an entry's author sees
+who liked it (click the count).
+
 **Feed** lists your friends' entries, most recently written first. Click one to
 open it and fly the map to its building, or click a username to open that
 friend's profile.
