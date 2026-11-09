@@ -461,6 +461,7 @@ body,
 }
 
 .field > span,
+.field > label,
 .field > legend {
   margin-bottom: 6px;
   padding: 0;
@@ -471,7 +472,8 @@ body,
   text-transform: uppercase;
 }
 
-.field > span {
+.field > span,
+.field > label {
   margin-bottom: 0;
 }
 
@@ -844,4 +846,114 @@ body,
   padding: 0 24px;
   color: var(--ink);
   font: 16px/1.5 system-ui, sans-serif;
+}
+
+/* Username input with a fixed "@" in front. */
+.username-input {
+  display: flex;
+  align-items: center;
+  border: 1px solid #d3d2dc;
+  border-radius: 8px;
+  color: var(--ink-soft);
+}
+
+.username-input > span {
+  padding-left: 10px;
+}
+
+.field .username-input input[type="text"] {
+  padding-left: 2px;
+  border: 0;
+  background: none;
+}
+
+.username-input:has(input:focus-visible) {
+  outline: 2px solid var(--building-hover);
+  outline-offset: 1px;
+}
+
+.field .username-input input:focus-visible {
+  outline: none;
+}
+
+.username-input:has([aria-invalid="true"]) {
+  border-color: #c62828;
+}
+
+.field-note,
+.field-ok {
+  font-size: 12px;
+}
+
+.field-note {
+  color: var(--ink-soft);
+}
+
+.field-ok {
+  color: #2e7d32;
+}
+
+.profile-bio {
+  margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.profile-bio-empty {
+  color: var(--ink-soft);
+}
+
+/* Blocking dialog over the whole app, e.g. picking a username. */
+.modal-backdrop {
+  position: fixed;
+  z-index: 10;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgb(31 29 58 / 45%);
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 400px;
+  max-width: 100%;
+  padding: 24px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 8px 32px rgb(0 0 0 / 30%);
+  color: var(--ink);
+  font: 14px/1.4 system-ui, sans-serif;
+}
+
+.modal h2 {
+  margin: 0;
+  color: var(--building);
+  font-size: 20px;
+}
+
+.modal p {
+  margin: 0;
+}
+
+.modal .modal-fine {
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+.modal-fine a {
+  color: var(--building-hover);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.modal button:focus-visible {
+  outline: 2px solid var(--building-hover);
+  outline-offset: 1px;
 }

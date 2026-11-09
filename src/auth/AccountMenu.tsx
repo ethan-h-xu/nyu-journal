@@ -5,13 +5,23 @@ import { GoogleButton } from "./GoogleButton";
 
 interface AccountMenuProps {
   auth: AuthState;
+  /** The signed-in user's username, once their profile has loaded. */
+  username: string | null;
+  onOpenProfile: () => void;
   onSignIn: () => void;
   onSignOut: () => void;
   onDeleteAccount: () => void;
 }
 
 /** The nav bar's right side: a sign-in button, or the signed-in user's menu. */
-export function AccountMenu({ auth, onSignIn, onSignOut, onDeleteAccount }: AccountMenuProps) {
+export function AccountMenu({
+  auth,
+  username,
+  onOpenProfile,
+  onSignIn,
+  onSignOut,
+  onDeleteAccount,
+}: AccountMenuProps) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -56,8 +66,19 @@ export function AccountMenu({ auth, onSignIn, onSignOut, onDeleteAccount }: Acco
         <div className="account-menu" role="menu">
           <div className="account-who">
             <strong>{name}</strong>
+            {username && <span>@{username}</span>}
             {email !== name && <span>{email}</span>}
           </div>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              setOpen(false);
+              onOpenProfile();
+            }}
+          >
+            My profile
+          </button>
           <button
             type="button"
             role="menuitem"
