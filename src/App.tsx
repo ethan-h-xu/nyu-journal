@@ -196,6 +196,15 @@ export function App() {
       <div className="app">
         <NavBar
           active={activeView}
+          alerts={
+            friends.incoming.length > 0
+              ? {
+                  profile: `${friends.incoming.length} friend ${
+                    friends.incoming.length === 1 ? "request" : "requests"
+                  }`,
+                }
+              : undefined
+          }
           onToggle={(view) => {
             // Its own button again closes it, like ×.
             if (activeView === view) return closePanel();
