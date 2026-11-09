@@ -54,8 +54,9 @@ export function BuildingPanel({ building, entries, onSave, onDelete, onBack, onC
           entry={editedEntry}
           onSave={(entry) => {
             onSave(entry);
-            // A new entry closes the panel; an edit returns to the log.
-            if (current === "new") onClose();
+            // A new entry returns to the previous panel (or closes if there's none);
+            // an edit returns to the log.
+            if (current === "new") (onBack ?? onClose)();
             else setEditing(null);
           }}
           onCancel={() => (entries.length > 0 ? setEditing(null) : onClose())}
