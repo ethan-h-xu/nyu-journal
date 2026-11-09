@@ -1,9 +1,12 @@
 import type { ReactNode } from "react";
 
 /** The views the nav bar opens. Add new ones here and to NAV_ITEMS. */
-export type NavView = "diary";
+export type NavView = "diary" | "feed";
 
-const NAV_ITEMS: { view: NavView; label: string }[] = [{ view: "diary", label: "Diary" }];
+const NAV_ITEMS: { view: NavView; label: string }[] = [
+  { view: "diary", label: "Diary" },
+  { view: "feed", label: "Feed" },
+];
 
 interface NavBarProps {
   active: NavView | null;

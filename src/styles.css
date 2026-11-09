@@ -732,6 +732,17 @@ body,
   color: var(--ink);
 }
 
+/* Bridges the gap above the menu, so moving the mouse from the avatar down
+   into the menu doesn't count as leaving it. */
+.account-menu::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  left: 0;
+  height: 8px;
+}
+
 .account-who {
   display: flex;
   flex-direction: column;
@@ -1176,4 +1187,33 @@ body,
   font-size: 20px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+}
+
+/* The author's username on a feed card, above the card-wide building link. */
+.feed-author {
+  position: relative;
+  z-index: 1;
+  display: block;
+  margin-bottom: 2px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--building-hover);
+  font: 600 13px/1.3 system-ui, sans-serif;
+  cursor: pointer;
+}
+
+.feed-author:hover {
+  text-decoration: underline;
+}
+
+/* Bridges the gap between the avatar and its menu, so moving the mouse down
+   onto the menu doesn't count as leaving it. */
+.account-menu::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  right: 0;
+  left: 0;
+  height: 8px;
 }

@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Building } from "../data/types";
 import { FriendButton } from "../friends/FriendButton";
+import { FriendEntryPanel } from "../friends/FriendEntryPanel";
 import { FriendsSection } from "../friends/FriendsSection";
 import type { Friends } from "../friends/useFriends";
 import { compareNewestFirst, daysAgo } from "../journal/format";
 import type { Journal } from "../journal/types";
 import { SidePanel } from "../ui/SidePanel";
 import { EditProfileForm } from "./EditProfileForm";
-import { EntryCard } from "../journal/EntryCard";
 import { ProfileActivity, buildingName } from "./ProfileActivity";
 import type { Profile } from "./types";
 import { RECENT_DAYS, RECENT_PAGE_SIZE, useUserActivity } from "./useUserActivity";
@@ -162,16 +162,13 @@ function OtherProfile({
 
   if (openEntry && isFriend) {
     return (
-      <SidePanel
-        title={buildingName(buildingsById, openEntry.buildingId)}
-        subtitle={`@${profile.username}'s entry`}
+      <FriendEntryPanel
+        buildingName={buildingName(buildingsById, openEntry.buildingId)}
+        username={profile.username}
+        entry={openEntry.entry}
         onBack={() => setOpenEntry(null)}
         onClose={onClose}
-      >
-        <div className="side-panel-body">
-          <EntryCard entry={openEntry.entry} />
-        </div>
-      </SidePanel>
+      />
     );
   }
 

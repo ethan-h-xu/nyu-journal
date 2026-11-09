@@ -3,6 +3,9 @@ import type { AuthState } from "./useAuth";
 import { profileOf } from "./useAuth";
 import { GoogleButton } from "./GoogleButton";
 
+/** How long the pointer can be away before a hover-opened menu closes. */
+const HOVER_CLOSE_DELAY_MS = 250;
+
 interface AccountMenuProps {
   auth: AuthState;
   /** The signed-in user's username, once their profile has loaded. */
@@ -27,6 +30,20 @@ export function AccountMenu({
 }: AccountMenuProps) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  // True while the menu is open only because a mouse is over it, so leaving
+  // closes it. Clicking the avatar makes it stay (false) until clicked away.
+  const hoverOpenRef = useRef(false);
+  const closeTimerRef = useRef<number | undefined>(undefined);
+
+  const cancelHoverClose = () => window.clearTimeout(closeTimerRef.current);
+
+  useEffect(() => {
+    if (!open) {
+      hoverOpenRef.current = false;
+      cancelHoverClose();
+    }
+  }, [open]);
+  useEffect(() => cancelHoverClose, []);
 
   // Close on any click outside the menu, or Escape.
   useEffect(() => {
@@ -50,7 +67,23 @@ export function AccountMenu({
 
   const { name, email, avatarUrl } = profileOf(auth.user);
   return (
-    <div className="account" ref={menuRef}>
+    <div
+      className="account"
+      ref={menuRef}
+      // Mouse only: touch has no hover, and keyboard users click.
+      onPointerEnter={(event) => {
+        if (event.pointerType !== "mouse") return;
+        cancelHoverClose();
+        if (!open) {
+          hoverOpenRef.current = true;
+          setOpen(true);
+        }
+      }}
+      onPointerLeave={(event) => {
+        if (event.pointerType !== "mouse" || !hoverOpenRef.current) return;
+        closeTimerRef.current = window.setTimeout(() => setOpen(false), HOVER_CLOSE_DELAY_MS);
+      }}
+    >
       <button
         type="button"
         className="account-button"
@@ -61,7 +94,14 @@ export function AccountMenu({
             ? `Account: ${name}, ${requestCount} friend ${requestCount === 1 ? "request" : "requests"}`
             : `Account: ${name}`
         }
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => {
+          // Already open from hovering: a click keeps it open rather than closing it.
+          if (open && hoverOpenRef.current) {
+            hoverOpenRef.current = false;
+            return;
+          }
+          setOpen((o) => !o);
+        }}
       >
         {avatarUrl ? (
           <img src={avatarUrl} alt="" referrerPolicy="no-referrer" />

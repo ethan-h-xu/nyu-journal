@@ -19,6 +19,10 @@ can add, edit, or delete entries.
 **Diary** in the nav bar lists every entry across all buildings, newest first.
 Click one to fly the map to its building and open that building's log.
 
+**Feed** lists your friends' entries, most recently written first. Click one to
+open it and fly the map to its building, or click a username to open that
+friend's profile.
+
 Sign in with Google to keep a diary; entries are stored in Supabase. Each user
 picks a username, can find others by username from **My profile**, and can send
 friend requests. Friends can see each other's entries, entry counts and friend
