@@ -15,7 +15,7 @@ export type ProfileStatus =
 function saveErrorMessage(error: PostgrestError): string {
   // unique_violation: someone else has the username (maybe since we checked).
   if (error.code === "23505") return "That username is taken.";
-  // check_violation: a rule the client should have caught, e.g. a reserved name.
+  // check_violation: a rule the client should have caught.
   if (error.code === "23514") return "That username or bio isn't allowed.";
   return error.message;
 }

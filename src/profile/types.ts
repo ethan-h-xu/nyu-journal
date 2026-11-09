@@ -6,12 +6,6 @@ export const BIO_MAX_LENGTH = 160;
 
 const USERNAME_PATTERN = /^[a-z0-9_]+$/;
 
-const RESERVED_USERNAMES = new Set([
-  "admin", "administrator", "root", "support", "help", "moderator", "mod",
-  "staff", "system", "official", "nyu", "shtboxd", "sh_tboxd", "null",
-  "undefined", "anonymous", "deleted", "me", "you", "everyone",
-]);
-
 /** A user's public profile. Nothing in it comes from their Google account. */
 export interface Profile {
   id: string;
@@ -30,6 +24,5 @@ export function usernameError(username: string): string | null {
     return `Use ${USERNAME_MAX_LENGTH} characters or fewer.`;
   if (!USERNAME_PATTERN.test(username))
     return "Use only letters, numbers, and underscores.";
-  if (RESERVED_USERNAMES.has(username)) return "That username isn't available.";
   return null;
 }
