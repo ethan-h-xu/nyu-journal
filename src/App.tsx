@@ -5,6 +5,7 @@ import { SignInPrompt } from "./auth/SignInPrompt";
 import { useAuth } from "./auth/useAuth";
 import { buildingsById } from "./data/buildings";
 import { DiaryPanel } from "./diary/DiaryPanel";
+import { useFriends } from "./friends/useFriends";
 import { BuildingPanel } from "./journal/BuildingPanel";
 import type { JournalEntry } from "./journal/types";
 import { useJournal } from "./journal/useJournal";
@@ -21,7 +22,8 @@ import { Toast } from "./ui/Toast";
 /** What the side panel over the map shows: a building's journal, a profile, or a nav view. */
 type Panel =
   | { kind: "building"; buildingId: string }
-  | { kind: "profile" }
+  /** `history`: profiles visited before this one, for the back button. */
+  | { kind: "profile"; userId: string; history: readonly string[] }
   | { kind: NavView }
   | null;
 
@@ -47,6 +49,8 @@ export function App() {
   useEffect(() => {
     if (profileStatus === "error") setToast("Couldn't load your profile.");
   }, [profileStatus]);
+  // Friendships need a profile on both ends, so wait for ours.
+  const friends = useFriends(profileStatus === "ready" ? userId : null, setToast);
 
   const [panel, setPanel] = useState<Panel>(null);
   const mapRef = useRef<CampusMapHandle>(null);
@@ -109,7 +113,8 @@ export function App() {
           <AccountMenu
             auth={auth}
             username={profile?.username ?? null}
-            onOpenProfile={() => setPanel({ kind: "profile" })}
+            requestCount={friends.incoming.length}
+            onOpenProfile={() => userId && setPanel({ kind: "profile", userId, history: [] })}
             onSignIn={handleSignIn}
             onSignOut={handleSignOut}
             onDeleteAccount={handleDeleteAccount}
@@ -156,7 +161,27 @@ export function App() {
           ))}
         {panel?.kind === "profile" &&
           (profile ? (
-            <ProfilePanel profile={profile} onSave={updateProfile} onClose={closePanel} />
+            <ProfilePanel
+              key={panel.userId}
+              userId={panel.userId}
+              ownProfile={profile}
+              friends={friends}
+              onSaveOwn={updateProfile}
+              onOpenProfile={(id) =>
+                setPanel({ kind: "profile", userId: id, history: [...panel.history, panel.userId] })
+              }
+              onBack={
+                panel.history.length > 0
+                  ? () =>
+                      setPanel({
+                        kind: "profile",
+                        userId: panel.history[panel.history.length - 1],
+                        history: panel.history.slice(0, -1),
+                      })
+                  : undefined
+              }
+              onClose={closePanel}
+            />
           ) : (
             <SidePanel title="Profile" onClose={closePanel}>
               <div className="side-panel-body panel-message">

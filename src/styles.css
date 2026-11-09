@@ -957,3 +957,190 @@ body,
   outline: 2px solid var(--building-hover);
   outline-offset: 1px;
 }
+
+/* Friend-request count on the account avatar and in its menu. */
+.account-badge {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border: 2px solid var(--building);
+  border-radius: 9px;
+  background: #e53935;
+  color: #fff;
+  font: 700 10px/14px system-ui, sans-serif;
+  text-align: center;
+  pointer-events: none;
+}
+
+.menu-badge {
+  display: inline-block;
+  min-width: 18px;
+  margin-left: 8px;
+  padding: 2px 5px;
+  border-radius: 9px;
+  background: #e53935;
+  color: #fff;
+  font: 700 11px/14px system-ui, sans-serif;
+  text-align: center;
+}
+
+/* Profile panel sections: Find friends, requests, friends. */
+.profile-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.profile-section h3 {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.section-count {
+  color: var(--ink);
+}
+
+.section-note {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #d3d2dc;
+  border-radius: 8px;
+  color: var(--ink);
+  font: inherit;
+}
+
+.search-input:focus-visible {
+  outline: 2px solid var(--building-hover);
+  outline-offset: 1px;
+}
+
+.user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.user-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+}
+
+.user-avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ece9f7;
+  color: var(--building);
+  font-weight: 700;
+}
+
+.user-row-name {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.user-link {
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--building);
+  font: 600 14px/1.3 system-ui, sans-serif;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.user-link:hover {
+  text-decoration: underline;
+}
+
+.user-row-note {
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+.user-row-actions {
+  display: flex;
+  flex: none;
+  gap: 6px;
+}
+
+.button-small {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.text-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--building-hover);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.friend-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.friend-state {
+  margin-right: auto;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.side-panel-titles {
+  flex: 1;
+  min-width: 0;
+}
+
+.side-panel-back {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  margin: -2px -4px 0 -8px;
+  padding: 0 0 3px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--ink-soft);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.side-panel-back:hover {
+  background: #f1f0f7;
+  color: var(--ink);
+}

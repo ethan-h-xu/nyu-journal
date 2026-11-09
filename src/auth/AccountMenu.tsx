@@ -7,6 +7,8 @@ interface AccountMenuProps {
   auth: AuthState;
   /** The signed-in user's username, once their profile has loaded. */
   username: string | null;
+  /** Friend requests waiting for an answer; shown as a badge. */
+  requestCount: number;
   onOpenProfile: () => void;
   onSignIn: () => void;
   onSignOut: () => void;
@@ -17,6 +19,7 @@ interface AccountMenuProps {
 export function AccountMenu({
   auth,
   username,
+  requestCount,
   onOpenProfile,
   onSignIn,
   onSignOut,
@@ -53,7 +56,11 @@ export function AccountMenu({
         className="account-button"
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-label={`Account: ${name}`}
+        aria-label={
+          requestCount > 0
+            ? `Account: ${name}, ${requestCount} friend ${requestCount === 1 ? "request" : "requests"}`
+            : `Account: ${name}`
+        }
         onClick={() => setOpen((o) => !o)}
       >
         {avatarUrl ? (
@@ -62,6 +69,12 @@ export function AccountMenu({
           <span>{name.charAt(0).toUpperCase()}</span>
         )}
       </button>
+      {requestCount > 0 && (
+        // Outside the button, which clips to a circle; the label already says the count.
+        <span className="account-badge" aria-hidden="true">
+          {requestCount > 9 ? "9+" : requestCount}
+        </span>
+      )}
       {open && (
         <div className="account-menu" role="menu">
           <div className="account-who">
@@ -78,6 +91,7 @@ export function AccountMenu({
             }}
           >
             My profile
+            {requestCount > 0 && <span className="menu-badge">{requestCount}</span>}
           </button>
           <button
             type="button"
