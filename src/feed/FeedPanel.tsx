@@ -16,6 +16,8 @@ interface FeedPanelProps {
   /** Only flies the map to a building; the map stays yours. */
   onFocusBuilding: (buildingId: string) => void;
   onOpenProfile: (userId: string) => void;
+  /** Returns to the panel opened before this one, if any. */
+  onBack?: () => void;
   onClose: () => void;
 }
 
@@ -28,6 +30,7 @@ export function FeedPanel({
   buildingsById,
   onFocusBuilding,
   onOpenProfile,
+  onBack,
   onClose,
 }: FeedPanelProps) {
   // An entry opened from the list; back returns to the list as it was.
@@ -46,7 +49,10 @@ export function FeedPanel({
   }
 
   return (
-    <SidePanel title="Feed" subtitle="Your friends' latest entries" onClose={onClose}>
+    <SidePanel title="Feed" subtitle="Your friends' latest entries"
+      onBack={onBack}
+      onClose={onClose}
+    >
       <div className="side-panel-body">
         {state.status === "loading" ? (
           <p className="empty-state">Loading…</p>

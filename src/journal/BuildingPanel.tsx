@@ -15,6 +15,8 @@ interface BuildingPanelProps {
   /** Adds the entry, or replaces the one with the same id. */
   onSave: (entry: JournalEntry) => void;
   onDelete: (entryId: string) => void;
+  /** Returns to the panel opened before this one, if any. */
+  onBack?: () => void;
   onClose: () => void;
 }
 
@@ -22,7 +24,7 @@ interface BuildingPanelProps {
  * A building's journal: its log of past entries, or the form for a new one when
  * it has none yet. Remount it (with `key`) when the building changes.
  */
-export function BuildingPanel({ building, entries, onSave, onDelete, onClose }: BuildingPanelProps) {
+export function BuildingPanel({ building, entries, onSave, onDelete, onBack, onClose }: BuildingPanelProps) {
   const [editing, setEditing] = useState<Editing>(null);
   const [title, ...otherNames] = building.names;
 
@@ -43,6 +45,7 @@ export function BuildingPanel({ building, entries, onSave, onDelete, onClose }: 
       title={title}
       aside={otherNames.length > 0 ? `Also: ${otherNames.join(", ")}` : undefined}
       subtitle={subtitle}
+      onBack={onBack}
       onClose={onClose}
     >
       {current ? (

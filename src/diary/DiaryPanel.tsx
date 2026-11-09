@@ -10,11 +10,13 @@ interface DiaryPanelProps {
   buildingsById: ReadonlyMap<string, Building>;
   /** Called when an entry is picked, to show its building on the map. */
   onOpenBuilding: (buildingId: string) => void;
+  /** Returns to the panel opened before this one, if any. */
+  onBack?: () => void;
   onClose: () => void;
 }
 
 /** Every journal entry across all buildings, newest first. */
-export function DiaryPanel({ journal, buildingsById, onOpenBuilding, onClose }: DiaryPanelProps) {
+export function DiaryPanel({ journal, buildingsById, onOpenBuilding, onBack, onClose }: DiaryPanelProps) {
   const items = useMemo(
     () =>
       [...journal]
@@ -34,6 +36,7 @@ export function DiaryPanel({ journal, buildingsById, onOpenBuilding, onClose }: 
             }`
           : undefined
       }
+      onBack={onBack}
       onClose={onClose}
     >
       <div className="side-panel-body">

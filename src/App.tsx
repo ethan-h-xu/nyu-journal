@@ -25,15 +25,27 @@ import { Toast } from "./ui/Toast";
 /** What the side panel over the map shows: a building's journal, a profile, or a nav view. */
 type Panel =
   | { kind: "building"; buildingId: string }
-  /**
-   * `history`: profiles visited before this one, for the back button.
-   * `returnTo`: the panel it was opened from (the feed, or wherever a "Liked by" list
-   * was), so backing out of the last profile returns there.
-   * `userId` is null only when the nav's Profile button is pressed while signed out.
-   */
-  | { kind: "profile"; userId: string | null; history: readonly string[]; returnTo?: Panel }
-  | { kind: Exclude<NavView, "profile"> }
-  | null;
+  /** `userId` is null only when the nav's Profile button is pressed while signed out. */
+  | { kind: "profile"; userId: string | null }
+  | { kind: Exclude<NavView, "profile"> };
+
+/** The open panel, and the panels opened before it (oldest first) for the back button. */
+interface PanelState {
+  current: Panel | null;
+  back: readonly Panel[];
+}
+
+const CLOSED: PanelState = { current: null, back: [] };
+/** Enough to retrace any realistic session without growing forever. */
+const MAX_BACK = 50;
+
+const samePanel = (a: Panel, b: Panel) =>
+  a.kind === b.kind &&
+  (a.kind === "building"
+    ? a.buildingId === (b as typeof a).buildingId
+    : a.kind === "profile"
+      ? a.userId === (b as typeof a).userId
+      : true);
 
 const NO_ENTRIES: readonly JournalEntry[] = [];
 
@@ -66,6 +78,27 @@ export function App() {
   const feed = useFeed(profileStatus === "ready" ? userId : null, friendProfiles);
   const { reload: reloadFeed } = feed;
 
+  const [panels, setPanels] = useState<PanelState>(CLOSED);
+  const panel = panels.current;
+  /** Opens a panel, remembering the one it replaces so back returns to it. */
+  const navigate = useCallback(
+    (next: Panel) =>
+      setPanels(({ current, back }) =>
+        current && samePanel(current, next)
+          ? { current, back }
+          : { current: next, back: current ? [...back, current].slice(-MAX_BACK) : [] },
+      ),
+    [],
+  );
+  const goBack = useCallback(
+    () =>
+      setPanels(({ back }) =>
+        back.length > 0 ? { current: back[back.length - 1], back: back.slice(0, -1) } : CLOSED,
+      ),
+    [],
+  );
+  const onBack = panels.back.length > 0 ? goBack : undefined;
+
   // Like counts for every entry on screen, shared so they agree everywhere.
   const likes = useLikes(profileStatus === "ready" ? userId : null, setToast);
   const { load: loadLikes } = likes;
@@ -79,16 +112,10 @@ export function App() {
         ? {
             ...likes,
             // From a "Liked by" list: back returns to the panel the list was in.
-            onOpenProfile: (id: string) =>
-              setPanel((current) => ({
-                kind: "profile",
-                userId: id,
-                history: [],
-                returnTo: current ?? undefined,
-              })),
+            onOpenProfile: (id: string) => navigate({ kind: "profile", userId: id }),
           }
         : null,
-    [profileStatus, likes],
+    [profileStatus, likes, navigate],
   );
   // Your own entries: once each (new entries as they're written).
   useEffect(() => void loadLikes(journalEntryIds), [journalEntryIds, loadLikes]);
@@ -102,16 +129,16 @@ export function App() {
     [feed.state.items, loadLikes],
   );
 
-  const [panel, setPanel] = useState<Panel>(null);
   const mapRef = useRef<CampusMapHandle>(null);
 
-  // A different account (or none) shouldn't see the last one's open panel.
-  useEffect(() => setPanel(null), [userId]);
+  // A different account (or none) shouldn't see the last one's panels.
+  useEffect(() => setPanels(CLOSED), [userId]);
 
-  const closePanel = useCallback(() => setPanel(null), []);
+  const closePanel = useCallback(() => setPanels(CLOSED), []);
   const openBuilding = useCallback(
-    (buildingId: string | null) => setPanel(buildingId ? { kind: "building", buildingId } : null),
-    [],
+    (buildingId: string | null) =>
+      buildingId ? navigate({ kind: "building", buildingId }) : closePanel(),
+    [navigate, closePanel],
   );
 
   const focusBuilding = useCallback(
@@ -170,23 +197,20 @@ export function App() {
         <NavBar
           active={activeView}
           onToggle={(view) => {
-            const opening = activeView !== view;
-            if (view === "profile") {
-              setPanel(opening ? { kind: "profile", userId, history: [] } : null);
-              return;
-            }
-            setPanel(opening ? { kind: view } : null);
+            // Its own button again closes it, like ×.
+            if (activeView === view) return closePanel();
+            navigate(view === "profile" ? { kind: "profile", userId } : { kind: view });
             // Opening the feed from the nav shows the latest; coming back from a profile doesn't.
-            if (opening && view === "feed") reloadFeed();
+            if (view === "feed") reloadFeed();
             // Opening the diary picks up likes friends have left since.
-            if (opening && view === "diary") void loadLikes(journalEntryIds, true);
+            if (view === "diary") void loadLikes(journalEntryIds, true);
           }}
           account={
             <AccountMenu
               auth={auth}
               username={profile?.username ?? null}
               requestCount={friends.incoming.length}
-              onOpenProfile={() => userId && setPanel({ kind: "profile", userId, history: [] })}
+              onOpenProfile={() => userId && navigate({ kind: "profile", userId })}
               onSignIn={handleSignIn}
               onSignOut={handleSignOut}
               onDeleteAccount={handleDeleteAccount}
@@ -202,7 +226,7 @@ export function App() {
           />
           {selectedBuilding &&
             (gate ? (
-              <SidePanel title={selectedBuilding.names[0]} onClose={closePanel}>
+              <SidePanel title={selectedBuilding.names[0]} onBack={onBack} onClose={closePanel}>
                 {gate}
               </SidePanel>
             ) : (
@@ -212,12 +236,13 @@ export function App() {
                 entries={journal.get(selectedBuilding.id) ?? NO_ENTRIES}
                 onSave={(entry) => void saveEntry(selectedBuilding.id, entry)}
                 onDelete={(entryId) => void deleteEntry(selectedBuilding.id, entryId)}
+                onBack={onBack}
                 onClose={closePanel}
               />
             ))}
           {panel?.kind === "diary" &&
             (gate ? (
-              <SidePanel title="Diary" onClose={closePanel}>
+              <SidePanel title="Diary" onBack={onBack} onClose={closePanel}>
                 {gate}
               </SidePanel>
             ) : (
@@ -228,12 +253,13 @@ export function App() {
                   openBuilding(buildingId);
                   mapRef.current?.focusBuilding(buildingId);
                 }}
+                onBack={onBack}
                 onClose={closePanel}
               />
             ))}
           {panel?.kind === "profile" &&
             (auth.status === "signedOut" ? (
-              <SidePanel title="Profile" onClose={closePanel}>
+              <SidePanel title="Profile" onBack={onBack} onClose={closePanel}>
                 <SignInPrompt onSignIn={handleSignIn} />
               </SidePanel>
             ) : profile ? (
@@ -250,25 +276,12 @@ export function App() {
                 }}
                 onFocusBuilding={focusBuilding}
                 onSaveOwn={updateProfile}
-                onOpenProfile={(id) =>
-                  setPanel({ ...panel, userId: id, history: [...panel.history, panel.userId ?? profile.id] })
-                }
-                onBack={
-                  panel.history.length > 0
-                    ? () =>
-                        setPanel({
-                          ...panel,
-                          userId: panel.history[panel.history.length - 1],
-                          history: panel.history.slice(0, -1),
-                        })
-                    : panel.returnTo
-                      ? () => setPanel(panel.returnTo ?? null)
-                      : undefined
-                }
+                onOpenProfile={(id) => navigate({ kind: "profile", userId: id })}
+                onBack={onBack}
                 onClose={closePanel}
               />
             ) : (
-              <SidePanel title="Profile" onClose={closePanel}>
+              <SidePanel title="Profile" onBack={onBack} onClose={closePanel}>
                 <div className="side-panel-body panel-message">
                   {profileStatus === "error" ? (
                     <>
@@ -285,7 +298,7 @@ export function App() {
             ))}
           {panel?.kind === "feed" &&
             (auth.status === "signedOut" ? (
-              <SidePanel title="Feed" onClose={closePanel}>
+              <SidePanel title="Feed" onBack={onBack} onClose={closePanel}>
                 <SignInPrompt onSignIn={handleSignIn} />
               </SidePanel>
             ) : profile ? (
@@ -296,13 +309,12 @@ export function App() {
                 friends={friends}
                 buildingsById={buildingsById}
                 onFocusBuilding={focusBuilding}
-                onOpenProfile={(id) =>
-                  setPanel({ kind: "profile", userId: id, history: [], returnTo: { kind: "feed" } })
-                }
+                onOpenProfile={(id) => navigate({ kind: "profile", userId: id })}
+                onBack={onBack}
                 onClose={closePanel}
               />
             ) : (
-              <SidePanel title="Feed" onClose={closePanel}>
+              <SidePanel title="Feed" onBack={onBack} onClose={closePanel}>
                 <div className="side-panel-body panel-message">
                   <p>Loadingâ€¦</p>
                 </div>

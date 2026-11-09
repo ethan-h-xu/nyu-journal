@@ -30,7 +30,7 @@ interface ProfilePanelProps {
   onFocusBuilding: (buildingId: string) => void;
   onSaveOwn: (fields: { username: string; bio: string }) => Promise<string | null>;
   onOpenProfile: (userId: string) => void;
-  /** Back to the previous profile; absent when there isn't one. */
+  /** Returns to the panel opened before this one, if any. */
   onBack?: () => void;
   onClose: () => void;
 }
