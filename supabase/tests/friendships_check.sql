@@ -1,4 +1,5 @@
--- Checks friendships' row-level security and functions against the real
+-- Checks friendships' row-level security and functions, and who can read
+-- diary entries and friend lists, against the real
 -- database without changing it: everything runs in one transaction that is
 -- rolled back at the end.
 --
@@ -33,6 +34,12 @@ declare
   n int;
   s text;
 begin
+  -- One diary entry each for A and B.
+  perform pg_temp.act_as(a);
+  insert into public.entries (building_id, visited_on) values ('zz-check', current_date);
+  perform pg_temp.act_as(b);
+  insert into public.entries (building_id, visited_on) values ('zz-check', current_date);
+
   -- A can't write the table directly.
   perform pg_temp.act_as(a);
   begin
@@ -55,6 +62,11 @@ begin
   select count(*) into n from public.friendships;
   if n <> 1 then raise exception 'FAIL: A sees % rows, expected 1', n; end if;
   if public.is_friend_of_me(b) then raise exception 'FAIL: pending counted as friends'; end if;
+
+  -- A pending request shares nothing.
+  perform pg_temp.act_as(b);
+  select count(*) into n from public.entries where user_id = a;
+  if n <> 0 then raise exception 'FAIL: B sees A''s entries while only pending'; end if;
 
   perform pg_temp.act_as(c);
   select count(*) into n from public.friendships;
@@ -82,12 +94,41 @@ begin
   if not public.is_friend_of_me(b) then raise exception 'FAIL: A not friends with B'; end if;
   if public.is_friend_of_me(c) then raise exception 'FAIL: A friends with C'; end if;
 
+  -- Friends can read, but not change, each other's entries.
+  perform pg_temp.act_as(b);
+  select count(*) into n from public.entries where user_id = a;
+  if n <> 1 then raise exception 'FAIL: B sees % of A''s entries, expected 1', n; end if;
+  update public.entries set notes = 'hacked' where user_id = a;
+  get diagnostics n = row_count;
+  if n <> 0 then raise exception 'FAIL: B edited A''s entry'; end if;
+  delete from public.entries where user_id = a;
+  get diagnostics n = row_count;
+  if n <> 0 then raise exception 'FAIL: B deleted A''s entry'; end if;
+
+  -- Non-friends still see nothing.
+  perform pg_temp.act_as(c);
+  select count(*) into n from public.entries where user_id in (a, b);
+  if n <> 0 then raise exception 'FAIL: C sees % entries of non-friends', n; end if;
+
   -- Mutual requests: C asks A, then A "asks" C, which accepts.
   perform pg_temp.act_as(c);
   perform public.send_friend_request(a);
   perform pg_temp.act_as(a);
   s := public.send_friend_request(c);
   if s <> 'accepted' then raise exception 'FAIL: mutual request returned %', s; end if;
+
+  -- C is friends with A but not B: sees A's entries and A's friend list, not B's entries.
+  perform pg_temp.act_as(c);
+  select count(*) into n from public.entries where user_id = a;
+  if n <> 1 then raise exception 'FAIL: C sees % of A''s entries, expected 1', n; end if;
+  select count(*) into n from public.entries where user_id = b;
+  if n <> 0 then raise exception 'FAIL: C sees B''s entries'; end if;
+  select count(*) into n from public.friendships where requester_id = a and addressee_id = b;
+  if n <> 1 then raise exception 'FAIL: C can''t see friend A''s friendship with B'; end if;
+  perform pg_temp.act_as(b);
+  select count(*) into n from public.friendships where c in (requester_id, addressee_id);
+  if n <> 1 then raise exception 'FAIL: B can''t see friend A''s friendship with C'; end if;
+  perform pg_temp.act_as(a);
 
   -- Declining deletes the row, so the sender can ask again.
   perform public.remove_friend(c);
@@ -102,8 +143,10 @@ begin
   perform pg_temp.act_as(b);
   perform public.remove_friend(a);
   if public.is_friend_of_me(a) then raise exception 'FAIL: still friends after unfriend'; end if;
+  select count(*) into n from public.entries where user_id = a;
+  if n <> 0 then raise exception 'FAIL: B still sees A''s entries after unfriending'; end if;
 
-  raise notice 'all friendship checks passed';
+  raise notice 'all friendship and visibility checks passed';
 end;
 $$;
 

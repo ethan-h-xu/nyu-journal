@@ -166,6 +166,13 @@ export function App() {
               userId={panel.userId}
               ownProfile={profile}
               friends={friends}
+              journal={journal}
+              buildingsById={buildingsById}
+              onOpenBuilding={(buildingId) => {
+                openBuilding(buildingId);
+                mapRef.current?.focusBuilding(buildingId);
+              }}
+              onFocusBuilding={(buildingId) => mapRef.current?.focusBuilding(buildingId)}
               onSaveOwn={updateProfile}
               onOpenProfile={(id) =>
                 setPanel({ kind: "profile", userId: id, history: [...panel.history, panel.userId] })

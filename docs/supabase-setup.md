@@ -1,8 +1,8 @@
 # Supabase setup
 
-The diary is stored in Supabase (Postgres + Auth). Sign-in is Google only, and
-every diary is strictly private: row-level security lets each user read and
-change only their own entries.
+The diary is stored in Supabase (Postgres + Auth). Sign-in is Google only.
+Row-level security lets each user change only their own entries, and read only
+their own and their friends'.
 
 The schema lives in `supabase/migrations/`. These steps create the hosted
 project, connect Google sign-in, and apply the schema. Everything here fits the
@@ -84,8 +84,23 @@ To put it online, continue with [deploy.md](deploy.md).
 | `notes` | text | At most 200 characters |
 | `created_at`, `updated_at` | timestamptz | Set by the database; owner and `created_at` can't be changed |
 
-Signed-out visitors have no access to the table. Signed-in users can select,
-insert, update and delete only rows where `user_id` is their own.
+Signed-out visitors have no access to the table. Signed-in users can insert,
+update and delete only rows where `user_id` is their own, and select their own
+rows and their friends'.
+
+`public.profiles`, one row per user who has picked a username (a missing row is
+what makes the app ask for one): `username` (unique, lowercase, 3–20 of
+`a-z 0-9 _`) and `bio` (at most 160 characters). Readable by every signed-in
+user; writable only by its owner.
+
+`public.friendships`, one row per pair of users: `requester_id`,
+`addressee_id`, and `status` (`pending` until the addressee accepts, then
+`accepted`). Users can read rows they're in, plus their friends' accepted
+friendships. Nobody writes the table directly; the app calls
+`send_friend_request`, `respond_to_friend_request` and `remove_friend`.
+`is_friend_of_me(other)` backs the friend-read policies.
+`supabase/tests/friendships_check.sql` checks these rules without changing
+anything.
 
 `public.delete_my_account()` deletes the caller's own account (and, by
 cascade, their entries); it backs the app's **Delete account** menu item.

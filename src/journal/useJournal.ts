@@ -7,7 +7,7 @@ type EntryRow = Database["public"]["Tables"]["entries"]["Row"];
 
 export type JournalStatus = "signedOut" | "loading" | "ready" | "error";
 
-function fromRow(row: EntryRow): { buildingId: string; entry: JournalEntry } {
+export function fromRow(row: EntryRow): { buildingId: string; entry: JournalEntry } {
   return {
     buildingId: row.building_id,
     entry: {
@@ -66,6 +66,8 @@ export function useJournal(userId: string | null, onError: (message: string) => 
       const { data, error } = await supabase
         .from("entries")
         .select("*")
+        // Load-bearing: RLS also returns friends' entries, and the journal (the
+        // map, Diary and building panels) must only ever hold the user's own.
         .eq("user_id", uid)
         .order("visited_on", { ascending: false })
         .order("created_at", { ascending: false });

@@ -18,7 +18,8 @@ export type FriendsStatus = "idle" | "loading" | "ready" | "error";
 
 const EMPTY: Relations = new Map();
 
-const byUsername = (a: Relation, b: Relation) => a.profile.username.localeCompare(b.profile.username);
+const byUsername = (a: Relation, b: Relation) =>
+  a.profile.username.localeCompare(b.profile.username);
 
 function withRelation(relations: Relations, relation: Relation): Relations {
   return new Map(relations).set(relation.profile.id, relation);
@@ -31,7 +32,11 @@ function withoutRelation(relations: Relations, otherId: string): Relations {
 }
 
 /** Puts back what an optimistic change replaced (or removes what it added). */
-function restored(relations: Relations, otherId: string, previous: Relation | undefined): Relations {
+function restored(
+  relations: Relations,
+  otherId: string,
+  previous: Relation | undefined,
+): Relations {
   return previous ? withRelation(relations, previous) : withoutRelation(relations, otherId);
 }
 
@@ -47,6 +52,19 @@ export function useFriends(userId: string | null, onError: (message: string) => 
   const [status, setStatus] = useState<FriendsStatus>("idle");
   const relationsRef = useRef(relations);
   relationsRef.current = relations;
+  // Users with a change in flight; a second click on them is ignored.
+  const busyRef = useRef(new Set<string>());
+
+  /** Runs `change` for one user at a time, so double clicks don't race. */
+  const exclusive = useCallback(async (otherId: string, change: () => Promise<void>) => {
+    if (busyRef.current.has(otherId)) return;
+    busyRef.current.add(otherId);
+    try {
+      await change();
+    } finally {
+      busyRef.current.delete(otherId);
+    }
+  }, []);
 
   const load = useCallback(
     async (uid: string, isCurrent: () => boolean) => {
@@ -55,7 +73,9 @@ export function useFriends(userId: string | null, onError: (message: string) => 
         .from("friendships")
         .select(
           "requester_id, addressee_id, status, requester:profiles!friendships_requester_id_fkey(id, username, bio), addressee:profiles!friendships_addressee_id_fkey(id, username, bio)",
-        );
+        )
+        // RLS also returns friends' friendships (for their profiles); only ours here.
+        .or(`requester_id.eq.${uid},addressee_id.eq.${uid}`);
       if (!isCurrent()) return;
       if (error) {
         setStatus("error");
@@ -95,54 +115,60 @@ export function useFriends(userId: string | null, onError: (message: string) => 
 
   /** Sends a request, or accepts theirs if they already sent one. */
   const sendRequest = useCallback(
-    async (profile: Profile) => {
-      const previous = relationsRef.current.get(profile.id);
-      const optimistic: RelationKind = previous?.kind === "incoming" ? "friend" : "outgoing";
-      setRelations((r) => withRelation(r, { kind: optimistic, profile }));
-      const { data, error } = await supabase.rpc("send_friend_request", { target: profile.id });
-      if (error) {
-        setRelations((r) => restored(r, profile.id, previous));
-        onError(`Couldn't send that friend request: ${errorText(error)}`);
-        return;
-      }
-      // The server knows best, e.g. if they sent us a request in the meantime.
-      const kind: RelationKind = data === "accepted" ? "friend" : "outgoing";
-      setRelations((r) => withRelation(r, { kind, profile }));
-    },
-    [onError],
+    (profile: Profile) =>
+      exclusive(profile.id, async () => {
+        const previous = relationsRef.current.get(profile.id);
+        // Becoming friends waits for the server (see `respond`); a new request can show at once.
+        if (previous?.kind !== "incoming")
+          setRelations((r) => withRelation(r, { kind: "outgoing", profile }));
+        const { data, error } = await supabase.rpc("send_friend_request", { target: profile.id });
+        if (error) {
+          setRelations((r) => restored(r, profile.id, previous));
+          onError(`Couldn't send that friend request: ${errorText(error)}`);
+          return;
+        }
+        // The server knows best, e.g. if they sent us a request in the meantime.
+        const kind: RelationKind = data === "accepted" ? "friend" : "outgoing";
+        setRelations((r) => withRelation(r, { kind, profile }));
+      }),
+    [exclusive, onError],
   );
 
   /** Accepts or declines a request the other user sent. */
   const respond = useCallback(
-    async (profile: Profile, accept: boolean) => {
-      const previous = relationsRef.current.get(profile.id);
-      setRelations((r) =>
-        accept ? withRelation(r, { kind: "friend", profile }) : withoutRelation(r, profile.id),
-      );
-      const { error } = await supabase.rpc("respond_to_friend_request", {
-        requester: profile.id,
-        accept,
-      });
-      if (error) {
-        setRelations((r) => restored(r, profile.id, previous));
-        onError(`Couldn't ${accept ? "accept" : "decline"} that request: ${errorText(error)}`);
-      }
-    },
-    [onError],
+    (profile: Profile, accept: boolean) =>
+      exclusive(profile.id, async () => {
+        const previous = relationsRef.current.get(profile.id);
+        // Declining is shown at once. Accepting waits for the server: being a
+        // friend lets their profile load entries, which fails until it's saved.
+        if (!accept) setRelations((r) => withoutRelation(r, profile.id));
+        const { error } = await supabase.rpc("respond_to_friend_request", {
+          requester: profile.id,
+          accept,
+        });
+        if (error) {
+          setRelations((r) => restored(r, profile.id, previous));
+          onError(`Couldn't ${accept ? "accept" : "decline"} that request: ${errorText(error)}`);
+          return;
+        }
+        if (accept) setRelations((r) => withRelation(r, { kind: "friend", profile }));
+      }),
+    [exclusive, onError],
   );
 
   /** Cancels a sent request, declines a received one, or unfriends. */
   const remove = useCallback(
-    async (profile: Profile) => {
-      const previous = relationsRef.current.get(profile.id);
-      setRelations((r) => withoutRelation(r, profile.id));
-      const { error } = await supabase.rpc("remove_friend", { other: profile.id });
-      if (error) {
-        setRelations((r) => restored(r, profile.id, previous));
-        onError(`Couldn't update that friendship: ${errorText(error)}`);
-      }
-    },
-    [onError],
+    (profile: Profile) =>
+      exclusive(profile.id, async () => {
+        const previous = relationsRef.current.get(profile.id);
+        setRelations((r) => withoutRelation(r, profile.id));
+        const { error } = await supabase.rpc("remove_friend", { other: profile.id });
+        if (error) {
+          setRelations((r) => restored(r, profile.id, previous));
+          onError(`Couldn't update that friendship: ${errorText(error)}`);
+        }
+      }),
+    [exclusive, onError],
   );
 
   const lists = useMemo(() => {

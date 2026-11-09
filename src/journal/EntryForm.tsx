@@ -1,5 +1,6 @@
 import { useId, useState } from "react";
 import type { FormEvent } from "react";
+import { today } from "./format";
 import { PoopRating } from "./PoopRating";
 import { FLOOR_MAX_LENGTH, NOTES_MAX_LENGTH } from "./types";
 import type { JournalEntry } from "./types";
@@ -17,12 +18,6 @@ function limit(text: string, max: number): string {
 }
 
 const charCount = (text: string) => Array.from(text).length;
-
-function today(): string {
-  const now = new Date();
-  const offset = now.getTimezoneOffset() * 60_000;
-  return new Date(now.getTime() - offset).toISOString().slice(0, 10);
-}
 
 function newEntry(): JournalEntry {
   return { id: crypto.randomUUID(), createdAt: Date.now(), date: today(), floor: "", rating: 0, notes: "" };

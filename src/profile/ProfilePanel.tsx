@@ -1,10 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type { Building } from "../data/types";
 import { FriendButton } from "../friends/FriendButton";
 import { FriendsSection } from "../friends/FriendsSection";
 import type { Friends } from "../friends/useFriends";
+import { compareNewestFirst, daysAgo } from "../journal/format";
+import type { Journal } from "../journal/types";
 import { SidePanel } from "../ui/SidePanel";
 import { EditProfileForm } from "./EditProfileForm";
+import { EntryCard } from "../journal/EntryCard";
+import { ProfileActivity, buildingName } from "./ProfileActivity";
 import type { Profile } from "./types";
+import { RECENT_DAYS, RECENT_PAGE_SIZE, useUserActivity } from "./useUserActivity";
+import type { ProfileEntry } from "./useUserActivity";
 import { useUserProfile } from "./useUserProfile";
 
 interface ProfilePanelProps {
@@ -13,6 +20,13 @@ interface ProfilePanelProps {
   /** The signed-in user's own profile. */
   ownProfile: Profile;
   friends: Friends;
+  /** The signed-in user's own entries, for their own profile. */
+  journal: Journal;
+  buildingsById: ReadonlyMap<string, Building>;
+  /** Opens a building's panel (yours) and shows it on the map, from your own entries. */
+  onOpenBuilding: (buildingId: string) => void;
+  /** Only flies the map to a building, e.g. for a friend's entry. */
+  onFocusBuilding: (buildingId: string) => void;
   onSaveOwn: (fields: { username: string; bio: string }) => Promise<string | null>;
   onOpenProfile: (userId: string) => void;
   /** Back to the previous profile; absent when there isn't one. */
@@ -21,11 +35,16 @@ interface ProfilePanelProps {
 }
 
 /**
- * A user's profile. Your own adds editing and the Friends section; anyone
- * else's has a friend button. Later phases add counts and recent entries.
+ * A user's profile. Your own adds editing and the Friends section. Anyone
+ * else's has a friend button, and once you're friends, their counts, recent
+ * entries and friends.
  */
 export function ProfilePanel(props: ProfilePanelProps) {
-  return props.userId === props.ownProfile.id ? <OwnProfile {...props} /> : <OtherProfile {...props} />;
+  return props.userId === props.ownProfile.id ? (
+    <OwnProfile {...props} />
+  ) : (
+    <OtherProfile {...props} />
+  );
 }
 
 function Bio({ bio }: { bio: string }) {
@@ -36,9 +55,31 @@ function Bio({ bio }: { bio: string }) {
   );
 }
 
-function OwnProfile({ ownProfile, friends, onSaveOwn, onOpenProfile, onBack, onClose }: ProfilePanelProps) {
+function OwnProfile({
+  ownProfile,
+  friends,
+  journal,
+  buildingsById,
+  onOpenBuilding,
+  onSaveOwn,
+  onOpenProfile,
+  onBack,
+  onClose,
+}: ProfilePanelProps) {
   const [editing, setEditing] = useState(false);
+  const [shown, setShown] = useState(RECENT_PAGE_SIZE);
   const { refresh } = friends;
+
+  // Your own entries are already loaded (and kept current) for the diary.
+  const items = useMemo(
+    () =>
+      [...journal]
+        .flatMap(([buildingId, entries]) => entries.map((entry) => ({ buildingId, entry })))
+        .sort((a, b) => compareNewestFirst(a.entry, b.entry)),
+    [journal],
+  );
+  const since = daysAgo(RECENT_DAYS);
+  const recent = items.filter(({ entry }) => entry.date > since).length;
 
   // Pick up requests sent since the page loaded.
   useEffect(() => refresh(), [refresh]);
@@ -60,6 +101,19 @@ function OwnProfile({ ownProfile, friends, onSaveOwn, onOpenProfile, onBack, onC
               Edit profile
             </button>
           </div>
+          <ProfileActivity
+            counts={{ status: "ready", value: { lifetime: items.length, recent } }}
+            entries={{
+              status: "ready",
+              items: items.slice(0, shown),
+              hasMore: items.length > shown,
+              loadingMore: false,
+            }}
+            onLoadMore={() => setShown((n) => n + RECENT_PAGE_SIZE)}
+            buildingsById={buildingsById}
+            onOpenEntry={({ buildingId }) => onOpenBuilding(buildingId)}
+            onOpenProfile={onOpenProfile}
+          />
           <FriendsSection selfId={ownProfile.id} friends={friends} onOpenProfile={onOpenProfile} />
         </div>
       )}
@@ -67,8 +121,21 @@ function OwnProfile({ ownProfile, friends, onSaveOwn, onOpenProfile, onBack, onC
   );
 }
 
-function OtherProfile({ userId, friends, onBack, onClose }: ProfilePanelProps) {
+function OtherProfile({
+  userId,
+  friends,
+  buildingsById,
+  onFocusBuilding,
+  onOpenProfile,
+  onBack,
+  onClose,
+}: ProfilePanelProps) {
   const { state, retry } = useUserProfile(userId);
+  // One of their entries, opened from the list; back returns to the list.
+  const [openEntry, setOpenEntry] = useState<ProfileEntry | null>(null);
+  // Only friends can see entries and friend lists, so only load them for friends.
+  const isFriend = friends.relations.get(userId)?.kind === "friend";
+  const activity = useUserActivity(isFriend ? userId : null);
 
   if (state.status !== "ready") {
     return (
@@ -92,11 +159,42 @@ function OtherProfile({ userId, friends, onBack, onClose }: ProfilePanelProps) {
   }
 
   const { profile } = state;
+
+  if (openEntry && isFriend) {
+    return (
+      <SidePanel
+        title={buildingName(buildingsById, openEntry.buildingId)}
+        subtitle={`@${profile.username}'s entry`}
+        onBack={() => setOpenEntry(null)}
+        onClose={onClose}
+      >
+        <div className="side-panel-body">
+          <EntryCard entry={openEntry.entry} />
+        </div>
+      </SidePanel>
+    );
+  }
+
   return (
     <SidePanel title={`@${profile.username}`} onBack={onBack} onClose={onClose}>
       <div className="side-panel-body">
         <Bio bio={profile.bio} />
         <FriendButton profile={profile} friends={friends} />
+        {isFriend && (
+          <ProfileActivity
+            counts={activity.counts}
+            entries={activity.pages}
+            onLoadMore={activity.loadMore}
+            friendList={activity.friendList}
+            buildingsById={buildingsById}
+            onOpenEntry={(item) => {
+              setOpenEntry(item);
+              onFocusBuilding(item.buildingId);
+            }}
+            onOpenProfile={onOpenProfile}
+            onRetry={activity.retry}
+          />
+        )}
       </div>
     </SidePanel>
   );

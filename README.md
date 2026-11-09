@@ -19,8 +19,11 @@ can add, edit, or delete entries.
 **Diary** in the nav bar lists every entry across all buildings, newest first.
 Click one to fly the map to its building and open that building's log.
 
-Sign in with Google to keep a diary; entries are stored in Supabase and are
-private to each account. Signed out, you can still browse the map.
+Sign in with Google to keep a diary; entries are stored in Supabase. Each user
+picks a username, can find others by username from **My profile**, and can send
+friend requests. Friends can see each other's entries, entry counts and friend
+lists; nobody else can. The map only ever shows your own entries. Signed out,
+you can still browse the map.
 
 Setup: [docs/supabase-setup.md](docs/supabase-setup.md) (database and Google
 sign-in), then [docs/deploy.md](docs/deploy.md) (Vercel and backups). For local
