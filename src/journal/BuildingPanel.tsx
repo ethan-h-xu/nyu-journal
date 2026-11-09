@@ -59,7 +59,8 @@ export function BuildingPanel({ building, entries, onSave, onDelete, onBack, onC
             if (current === "new") (onBack ?? onClose)();
             else setEditing(null);
           }}
-          onCancel={() => (entries.length > 0 ? setEditing(null) : onClose())}
+          // With entries, back to the log; with none, back to the previous panel (or close).
+          onCancel={() => (entries.length > 0 ? setEditing(null) : (onBack ?? onClose)())}
         />
       ) : (
         <div className="side-panel-body">
