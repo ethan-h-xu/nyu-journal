@@ -29,9 +29,10 @@ type Panel =
    * `history`: profiles visited before this one, for the back button.
    * `returnTo`: the panel it was opened from (the feed, or wherever a "Liked by" list
    * was), so backing out of the last profile returns there.
+   * `userId` is null only when the nav's Profile button is pressed while signed out.
    */
-  | { kind: "profile"; userId: string; history: readonly string[]; returnTo?: Panel }
-  | { kind: NavView }
+  | { kind: "profile"; userId: string | null; history: readonly string[]; returnTo?: Panel }
+  | { kind: Exclude<NavView, "profile"> }
   | null;
 
 const NO_ENTRIES: readonly JournalEntry[] = [];
@@ -154,8 +155,14 @@ export function App() {
 
   const selectedId = panel?.kind === "building" ? panel.buildingId : null;
   const selectedBuilding = selectedId ? buildingsById.get(selectedId) : undefined;
-  const activeView =
-    panel && panel.kind !== "building" && panel.kind !== "profile" ? panel.kind : null;
+  const activeView: NavView | null =
+    panel?.kind === "profile"
+      ? panel.userId === userId
+        ? "profile"
+        : null
+      : panel && panel.kind !== "building"
+        ? panel.kind
+        : null;
 
   return (
     <LikesContext value={likesContext}>
@@ -163,7 +170,11 @@ export function App() {
         <NavBar
           active={activeView}
           onToggle={(view) => {
-            const opening = panel?.kind !== view;
+            const opening = activeView !== view;
+            if (view === "profile") {
+              setPanel(opening ? { kind: "profile", userId, history: [] } : null);
+              return;
+            }
             setPanel(opening ? { kind: view } : null);
             // Opening the feed from the nav shows the latest; coming back from a profile doesn't.
             if (opening && view === "feed") reloadFeed();
@@ -221,10 +232,14 @@ export function App() {
               />
             ))}
           {panel?.kind === "profile" &&
-            (profile ? (
+            (auth.status === "signedOut" ? (
+              <SidePanel title="Profile" onClose={closePanel}>
+                <SignInPrompt onSignIn={handleSignIn} />
+              </SidePanel>
+            ) : profile ? (
               <ProfilePanel
-                key={panel.userId}
-                userId={panel.userId}
+                key={panel.userId ?? profile.id}
+                userId={panel.userId ?? profile.id}
                 ownProfile={profile}
                 friends={friends}
                 journal={journal}
@@ -236,7 +251,7 @@ export function App() {
                 onFocusBuilding={focusBuilding}
                 onSaveOwn={updateProfile}
                 onOpenProfile={(id) =>
-                  setPanel({ ...panel, userId: id, history: [...panel.history, panel.userId] })
+                  setPanel({ ...panel, userId: id, history: [...panel.history, panel.userId ?? profile.id] })
                 }
                 onBack={
                   panel.history.length > 0
