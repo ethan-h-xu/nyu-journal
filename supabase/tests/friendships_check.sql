@@ -126,12 +126,12 @@ begin
   insert into public.entry_likes (entry_id) values (ea);
   select like_count, liked_by_me into n, liked from public.entry_like_summaries(array[ea]);
   if n <> 2 or not liked then raise exception 'FAIL: A sees % likes (liked: %), expected 2 and true', n, liked; end if;
-  -- The author sees who liked their entry; other likers see only their own like.
+  -- Everyone who can see the entry sees who liked it: the author and friends.
   select count(*) into n from public.entry_likes where entry_id = ea;
   if n <> 2 then raise exception 'FAIL: author A reads % like rows on their entry, expected 2', n; end if;
   perform pg_temp.act_as(b);
   select count(*) into n from public.entry_likes where entry_id = ea;
-  if n <> 1 then raise exception 'FAIL: B reads % like rows on A''s entry, expected only their own', n; end if;
+  if n <> 2 then raise exception 'FAIL: friend B reads % like rows on A''s entry, expected 2', n; end if;
   perform pg_temp.act_as(a);
 
   -- Non-friends still see nothing.
@@ -140,6 +140,8 @@ begin
   if n <> 0 then raise exception 'FAIL: C sees % entries of non-friends', n; end if;
   select count(*) into n from public.entry_like_summaries(array[ea, eb]);
   if n <> 0 then raise exception 'FAIL: C gets like counts for non-friends'' entries'; end if;
+  select count(*) into n from public.entry_likes;
+  if n <> 0 then raise exception 'FAIL: C reads % like rows on non-friends'' entries', n; end if;
 
   -- Mutual requests: C asks A, then A "asks" C, which accepts.
   perform pg_temp.act_as(c);
@@ -156,11 +158,11 @@ begin
   if n <> 0 then raise exception 'FAIL: C sees B''s entries'; end if;
   select count(*) into n from public.friendships where requester_id = a and addressee_id = b;
   if n <> 1 then raise exception 'FAIL: C can''t see friend A''s friendship with B'; end if;
-  -- C counts B's like on A's entry, though C and B aren't friends, but can't see who.
+  -- C counts and sees B's like on A's entry, though C and B aren't friends.
   select like_count, liked_by_me into n, liked from public.entry_like_summaries(array[ea]);
   if n <> 2 or liked then raise exception 'FAIL: C sees % likes (liked: %), expected 2 and false', n, liked; end if;
-  select count(*) into n from public.entry_likes;
-  if n <> 0 then raise exception 'FAIL: C can read % like rows', n; end if;
+  select count(*) into n from public.entry_likes where entry_id = ea;
+  if n <> 2 then raise exception 'FAIL: C reads % like rows on friend A''s entry, expected 2', n; end if;
   perform pg_temp.act_as(b);
   select count(*) into n from public.friendships where c in (requester_id, addressee_id);
   if n <> 1 then raise exception 'FAIL: B can''t see friend A''s friendship with C'; end if;
@@ -183,6 +185,8 @@ begin
   if n <> 0 then raise exception 'FAIL: B still sees A''s entries after unfriending'; end if;
   select count(*) into n from public.entry_like_summaries(array[ea]);
   if n <> 0 then raise exception 'FAIL: B still gets like counts after unfriending'; end if;
+  select count(*) into n from public.entry_likes where entry_id = ea;
+  if n <> 1 then raise exception 'FAIL: unfriended B reads % like rows, expected only their own', n; end if;
   -- B can still take back their own like.
   delete from public.entry_likes where entry_id = ea;
   get diagnostics n = row_count;

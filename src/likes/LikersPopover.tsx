@@ -11,8 +11,8 @@ interface LikersPopoverProps {
 }
 
 /**
- * Who liked one of your entries, newest first. Only an entry's author can
- * read this (row-level security); everyone else only gets counts.
+ * Who liked an entry, newest first. Row-level security lets anyone who can
+ * see the entry (its author and their friends) read this.
  */
 export function LikersPopover({ entryId, onOpenProfile, onClose }: LikersPopoverProps) {
   const [likers, setLikers] = useState<Likers>({ status: "loading" });

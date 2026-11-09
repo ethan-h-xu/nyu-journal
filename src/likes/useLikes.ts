@@ -104,8 +104,6 @@ export function useLikes(userId: string | null, onError: (message: string) => vo
 export type Likes = ReturnType<typeof useLikes>;
 
 export interface LikesContextValue extends Likes {
-  /** Entries the signed-in user wrote; on these the count shows who liked. */
-  ownEntryIds: ReadonlySet<string>;
   /** Opens a user's profile, from the list of who liked an entry. */
   onOpenProfile: (userId: string) => void;
 }

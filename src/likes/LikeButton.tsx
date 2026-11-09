@@ -3,8 +3,8 @@ import { LikersPopover } from "./LikersPopover";
 import { useLikesContext } from "./useLikes";
 
 /**
- * A heart and the entry's like count. On your own entries the count is a
- * button that shows who liked it. Renders nothing without a LikesContext.
+ * A heart and the entry's like count; the count is a button that shows who
+ * liked it. Renders nothing without a LikesContext.
  */
 export function LikeButton({ entryId }: { entryId: string }) {
   const likes = useLikesContext();
@@ -15,7 +15,8 @@ export function LikeButton({ entryId }: { entryId: string }) {
   const info = likes.likes.get(entryId);
   const count = info?.count ?? 0;
   const liked = info?.likedByMe ?? false;
-  const canSeeLikers = likes.ownEntryIds.has(entryId) && count > 0;
+  // Anyone who can see the entry can see who liked it.
+  const canSeeLikers = count > 0;
   const countLabel = `${count} ${count === 1 ? "like" : "likes"}`;
 
   return (

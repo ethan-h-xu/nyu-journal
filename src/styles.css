@@ -1263,7 +1263,7 @@ body,
   font-variant-numeric: tabular-nums;
 }
 
-/* Heart plus, on your own entries, a count that lists who liked it. */
+/* Heart plus a count that lists who liked it. */
 .like {
   position: relative;
   z-index: 1;

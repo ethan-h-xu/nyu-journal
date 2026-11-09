@@ -20,8 +20,8 @@ can add, edit, or delete entries.
 Click one to fly the map to its building and open that building's log.
 
 Entries everywhere have a ♡ like button and count. You can like your own
-entries and your friends'; everyone sees counts, and only an entry's author sees
-who liked it (click the count).
+entries and your friends'; anyone who can see an entry can see who liked it
+(click the count).
 
 **Feed** lists your friends' entries, most recently written first. Click one to
 open it and fly the map to its building, or click a username to open that

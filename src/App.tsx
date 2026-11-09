@@ -72,13 +72,11 @@ export function App() {
     () => [...journal.values()].flatMap((entries) => entries.map((entry) => entry.id)),
     [journal],
   );
-  const ownEntryIds = useMemo(() => new Set(journalEntryIds), [journalEntryIds]);
   const likesContext = useMemo(
     () =>
       profileStatus === "ready"
         ? {
             ...likes,
-            ownEntryIds,
             // From a "Liked by" list: back returns to the panel the list was in.
             onOpenProfile: (id: string) =>
               setPanel((current) => ({
@@ -89,7 +87,7 @@ export function App() {
               })),
           }
         : null,
-    [profileStatus, likes, ownEntryIds],
+    [profileStatus, likes],
   );
   // Your own entries: once each (new entries as they're written).
   useEffect(() => void loadLikes(journalEntryIds), [journalEntryIds, loadLikes]);
